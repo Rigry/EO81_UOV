@@ -1,6 +1,6 @@
 TARGET_F1 = EO81v2
 DEBUG = 1
-OPT = -Os
+#OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
 
