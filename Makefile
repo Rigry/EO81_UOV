@@ -15,7 +15,7 @@ LDSCRIPT_F1 = $(LIBRARY_PATH)/STM32F1_files/STM32F103RBTx_FLASH.ld
 
 # C includes
 C_INCLUDES =  
-C_INCLUDES += -I.
+C_INCLUDES += -I./src
 C_INCLUDES += -I$(LIBRARY_PATH)/STM32F1_files
 C_INCLUDES += -I$(LIBRARY_PATH)/STM32F1_files/CMSIS
 C_INCLUDES += -I$(LIBRARY_PATH)/src
@@ -54,7 +54,7 @@ MCU_F1 = $(CPU_F1) -mthumb $(FPU_F1) $(FLOAT-ABI_F1)
 ASFLAGS_F1 = $(MCU_F1) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS_F1  = $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
-CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields
+CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics
 CFLAGS_F1 += -g -gdwarf-2 
 
 

@@ -2,7 +2,7 @@
 #define F_OSC   8000000UL
 #define F_CPU   72000000UL
 #include "stm32f103xb.h"
-#include "rcc.h"
+#include "periph_rcc.h"
 #include "periph_flash.h"
 #include "pin.h"
 #include "buttons.h"
@@ -32,87 +32,54 @@ extern "C" void init_clock ()
       .set      (mcu::RCC::SystemClock::CS_PLL);
 }
 
-// auto& PB = mcu::make_reference<mcu::Periph::GPIOB>();
-// volatile auto& b = PB.like_CMSIS();
-
 int main()
 {
-   // auto up = mcu::Button::make<mcu::PB8>();
+   auto up = mcu::Button::make<mcu::PB8>();
    // auto down = mcu::Button::make<mcu::PB9>();
    // auto delay = mcu::Delay::make<mcu::Periph::TIM4>(); 
-   auto& led3 = mcu::Pin::make_new<mcu::PC7, mcu::PinMode::Output>();
-   auto& led2 = mcu::Pin::make_new<mcu::PC6, mcu::PinMode::Output>();
+   // auto& led3 = Pin::make<mcu::PC7, mcu::PinMode::Output>();
+   // auto& led2 = Pin::make<mcu::PC6, mcu::PinMode::Output>();
    // // auto led5 = mcu::Pin::make_new<mcu::PC9, mcu::PinMode::Output>();
-   auto& led1 = mcu::Pin::make_new<mcu::PB12, mcu::PinMode::Output>();
-   auto& lcd = mcu::LCD::make<mcu::PC12, mcu::PD2, mcu::PB3, mcu::PB4, mcu::PB5, mcu::PB6, mcu::PB7, mcu::PB8>();
-   // // auto lcd = mcu::LCD::make<mcu::PC12, mcu::PD2, mcu::PA12, mcu::PB12, mcu::PC6, mcu::PC7, mcu::PC9>();
-   // auto& pb4 = mcu::Pin::make_new<mcu::PB4, mcu::PinMode::Output>();
-   // auto& portC = mcu::make_reference<mcu::Periph::GPIOC>();
-   // auto& portB = mcu::make_reference<mcu::Periph::GPIOB>();
-   // lcd.clear();
-   // lcd.send();
+   // auto& led1 = Pin::make<mcu::PB12, mcu::PinMode::Output>();
+   auto& lcd = mcu::LCD::make<mcu::PC12, mcu::PD2, mcu::PB3, mcu::PB4, mcu::PB5, mcu::PB6, mcu::PB7>();
+   
+   lcd << "Hello, World! Alex_Plus - Ultrasound company";
+   lcd << string;
+   // lcd << "Alex_Plus";
+   // lcd << "Hello, World! Alex_Plus Ultrasound company";
+//    lcd << "It was on the corner of the street that he noticed the first sign of\
+// something peculiar - a cat reading a map. For a second, Mr. Dursley\
+// didn't realize what he had seen -- then he jerked his head around to\
+// look again.";
+   // lcd << "Hello, World!";
+   // lcd << "Alex_Plus";
+   
+   // lcd << "Alex_";
+   //  lcd << "Hello, World!";
 
-  
-
-   // Timer timer {10};
-   // Timer timer1 {200};
-   // Timer timer2 {100};
-
-   // while(1){
-      
-      // delay<100000>();
-      // led1 ^= true;
-
-      // int n = 1000;
-      // while(n){
-         // delay<10>();
-         // n--;
-      // }
-
-      // volatile GPIO_TypeDef* b = (GPIO_TypeDef*) GPIOB_BASE;
-
-      // RCC->APB2ENR |= RCC_APB2ENR_IOPBEN_Msk;
-      // while ((RCC->APB2ENR & RCC_APB2ENR_IOPBEN_Msk) == 0) {}
-      // b->CRL = 0x11111444;
-
-	   // b->BSRR = 1 << 4+16;
-
-	   // b->BSRR = 1 << 4;
-
-      // pb4 ^= true;
-
-      // delay<100>();
-      // b.ODR = 0;
-      
-      // delay<100>();
-      // b.ODR = 1 << 4;
-
-      
-      // if(timer.event())
-      //    led2 ^= true;
-      
-
-   // }
-
+   // lcd << "Hello, World! Alex_Plus - Ultrasound company";
 
    while (1) { 
-      led3 = true;
-      delay<50000>();
-      led3 = false; 
-      delay<50000>();
-      led2 = true;
-      delay<50000>();
-      led2 = false;
-      delay<50000>();
-      led1 = true;
-      delay<150000>();
-      led1 = false;
-      delay<150000>();
-      led2 = true;
-      delay<150000>();
-      led2 = false;
-      delay<200000>();
-   
+      // led3 = true;
+      // delay<50000>();
+      // led3 = false; 
+      // delay<50000>();
+      // led2 = true;
+      // delay<50000>();
+      // led2 = false;
+      // delay<50000>();
+      // led1 = true;
+      // delay<150000>();
+      // led1 = false;
+      // delay<150000>();
+      // led2 = true;
+      // delay<150000>();
+      // led2 = false;
+      // delay<200000>();
+      // lcd << "Hello, World!";
+      // lcd << "Alex_Plus";
+      if (up)
+         lcd << " - Ultrasound company";
 
    }
 
