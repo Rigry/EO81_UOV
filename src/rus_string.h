@@ -13,4 +13,4 @@ static constexpr unsigned char  convert_HD44780[64] =
 	0xC1,0xE6,0xC2,0xC3,0xC4,0xC5,0xC6,0xC7
 };
 
-std::string_view string {"Привет, Мир"};
+std::string_view string {"Привет, мир"};

@@ -43,20 +43,21 @@ int main()
    // auto& led1 = Pin::make<mcu::PB12, mcu::PinMode::Output>();
    auto& lcd = mcu::LCD::make<mcu::PC12, mcu::PD2, mcu::PB3, mcu::PB4, mcu::PB5, mcu::PB6, mcu::PB7>();
    
-   lcd << "Hello, World! Alex_Plus - Ultrasound company";
-   lcd << string;
-   // lcd << "Alex_Plus";
+   lcd.set_line(1).central() << "Alex_Plus Ultrasound company";
+   lcd.set_line(2).central() << string;
+   lcd.set_line(0).set_cursor(5) << "Alex_Plus";
    // lcd << "Hello, World! Alex_Plus Ultrasound company";
 //    lcd << "It was on the corner of the street that he noticed the first sign of\
 // something peculiar - a cat reading a map. For a second, Mr. Dursley\
 // didn't realize what he had seen -- then he jerked his head around to\
 // look again.";
-   // lcd << "Hello, World!";
-   // lcd << "Alex_Plus";
+   // lcd.set_line(2).central() << "Hello, World!";
+   lcd.set_line(3).central() << 587;
    
    // lcd << "Alex_";
-   //  lcd << "Hello, World!";
-
+   //  lcd.set_cursor(2) << "Hello, World!";
+   int p {0};
+   // lcd << p;
    // lcd << "Hello, World! Alex_Plus - Ultrasound company";
 
    while (1) { 
@@ -78,9 +79,11 @@ int main()
       // delay<200000>();
       // lcd << "Hello, World!";
       // lcd << "Alex_Plus";
-      if (up)
-         lcd << " - Ultrasound company";
-
+      // if (up)
+      //    lcd << " - Ultrasound company";
+      // lcd << p;
+      // p++;
+      // if (p > 9) p = 0;
    }
 
    
