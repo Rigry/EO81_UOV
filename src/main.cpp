@@ -41,7 +41,7 @@ int main()
    // auto& led2 = Pin::make<mcu::PC6, mcu::PinMode::Output>();
    // // auto led5 = mcu::Pin::make_new<mcu::PC9, mcu::PinMode::Output>();
    // auto& led1 = Pin::make<mcu::PB12, mcu::PinMode::Output>();
-   auto& lcd = mcu::LCD::make<mcu::PC12, mcu::PD2, mcu::PB3, mcu::PB4, mcu::PB5, mcu::PB6, mcu::PB7>();
+   auto& lcd = LCD::make<mcu::PC12, mcu::PD2, mcu::PB3, mcu::PB4, mcu::PB5, mcu::PB6, mcu::PB7>();
    
    lcd.set_line(1).central() << "Alex_Plus Ultrasound company";
    lcd.set_line(2).central() << string;
