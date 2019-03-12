@@ -1,24 +1,12 @@
 #define STM32F103xB
 #define F_OSC   8000000UL
 #define F_CPU   72000000UL
+
 #include "stm32f103xb.h"
 #include "periph_rcc.h"
 #include "periph_flash.h"
-#include "pin.h"
-#include "buttons.h"
-// #include "timers.h"
-#include "delay.h"
-#include "rus_string.h"
-#include "string_buffer.h"
-#include "hd44780.h"
-
-using E  = mcu::PB3;
-using RW = mcu::PD2;
-using RS = mcu::PC12;
-using DB4 = mcu::PB4;
-using DB5 = mcu::PB5;
-using DB6 = mcu::PB6;
-using DB7 = mcu::PB7;
+#include "main.h"
+#include "menu.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -43,21 +31,20 @@ extern "C" void init_clock ()
 }
 
 
-
-
-
 int main()
 {
    String_buffer lcd;
    HD44780::make<RS, RW, E, DB4, DB5, DB6, DB7>(lcd.get_buffer());
-   lcd.center() << "Hello, World!" << next_line;
-   lcd.center() << "Alex_Plus";
-   
-   
+   auto& menu = Menu::make<BTN_UP, BTN_DOWN>(lcd);
    
    while (1) {
+
+      menu();
       
+      // process();
+      // us_led = us ^= us_on;
+      // uv_led = uv ^= uv_on;
+      __WFI();
    }
 
-   
 }
