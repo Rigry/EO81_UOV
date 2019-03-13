@@ -36,10 +36,14 @@ int main()
    String_buffer lcd;
    HD44780::make<RS, RW, E, DB4, DB5, DB6, DB7>(lcd.get_buffer());
    auto& menu = Menu::make<BTN_UP, BTN_DOWN>(lcd);
+   // auto& led2 = Pin::make<mcu::PC6, mcu::PinMode::Output>();
+   // auto up = mcu::Button::make<mcu::PB8>();
+   // auto down = mcu::Button::make<mcu::PB9>();
    
    while (1) {
 
       menu();
+      // led2 = up and down;
       
       // process();
       // us_led = us ^= us_on;

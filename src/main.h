@@ -33,26 +33,28 @@ using RX_master  = mcu::PC11;   using RX_slave  = mcu::PA10;
 using RTS_master = mcu::PA15;   using RTS_slave = mcu::PA8;
 using LED_master = mcu::PC9;    using LED_slave = mcu::PA12;
 
+struct Flash_data {
+      uint16_t factory_number = 0;
+      UART::Settings uart_set = {
+         .parity_enable  = false,
+         .parity         = USART::Parity::even,
+         .data_bits      = USART::DataBits::_8,
+         .stop_bits      = USART::StopBits::_1,
+         .baudrate       = USART::Baudrate::BR9600,
+         .res            = 0
+      };
+      uint8_t  modbus_address        = 1;
+      uint16_t max_temperature       = 55;
+      uint16_t uv_level_min          = 40;  
+      uint16_t qty_uv_lamps          = 5;
+      uint16_t uv_level_highest      = 0x0100;
+      uint16_t model_number          = 0;
+      uint16_t temperature_recovery  = 20; 
+   } flash;
+
 // void process()
 // {
-//    struct Flash_data {
-//       uint16_t factory_number = 0;
-//       UART::Settings uart_set = {
-//          .parity_enable  = false,
-//          .parity         = USART::Parity::even,
-//          .data_bits      = USART::DataBits::_8,
-//          .stop_bits      = USART::StopBits::_1,
-//          .baudrate       = USART::Baudrate::BR9600,
-//          .res            = 0
-//       };
-//       uint8_t  modbus_address        = 1;
-//       uint16_t max_temperature       = 55;
-//       uint16_t uv_level_min          = 40;  
-//       uint16_t qty_uv_lamps          = 5;
-//       uint16_t uv_level_highest      = 0x0100;
-//       uint16_t model_number          = 0;
-//       uint16_t temperature_recovery  = 20; 
-//    } flash;
+//    
 
 //    struct In_regs {
    

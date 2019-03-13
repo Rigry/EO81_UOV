@@ -1,6 +1,6 @@
 TARGET_F1 = EO81v2
 DEBUG = 1
-OPT = -Os
+OPT = -O0
 CPPSTD =-std=c++17
 BUILD_DIR = build
 
@@ -54,7 +54,7 @@ MCU_F1 = $(CPU_F1) -mthumb $(FPU_F1) $(FLOAT-ABI_F1)
 ASFLAGS_F1 = $(MCU_F1) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 CFLAGS_F1  = $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
-CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics
+CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -fexec-charset=cp1251
 CFLAGS_F1 += -g -gdwarf-2 
 
 
