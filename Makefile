@@ -1,6 +1,6 @@
 TARGET_F1 = EO81v2
 DEBUG = 1
-OPT = -O0
+OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
 
@@ -8,7 +8,7 @@ BUILD_DIR = build
 # source
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
-LIBRARY_PATH = /net/factory/users/aag/code/mculib3
+LIBRARY_PATH = ../mculib3
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s
 LDSCRIPT_F1 = $(LIBRARY_PATH)/STM32F1_files/STM32F103RBTx_FLASH.ld

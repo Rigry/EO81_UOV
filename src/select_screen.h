@@ -21,17 +21,18 @@ public:
                  , lcd  {lcd} {};
 
    void set_screen(size_t qty) {qty_screen = qty;}
+   void set_position(size_t n) {line = n;}
    void position() 
    {
       if (up.push()) { 
          line -= 1;
-         if (line < 1) line = 4;
+         if (line < 1) line = qty_screen;
       }
       if (down.push()) {
          line += 1;
-         if (line > 4) line = 1;
+         if (line > qty_screen) line = 1;
       } 
-      for (size_t i = 1; i <= 4; i++)
+      for (size_t i = 1; i <= qty_screen; i++)
       {
          lcd.line(i-1).cursor(19) << " ";
          if (i == line)

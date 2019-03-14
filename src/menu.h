@@ -80,44 +80,82 @@ public:
             }
          break;
          case Screen::select:
-            lcd.line(0) << "Аварии" << next_line
-             << "Наработка";
+            lcd.line(0) << "Аварии";
+            lcd.line(1) << "Наработка";
             lcd.line(2) << "Конфигурация";
             lcd.line(3) << "Лог работы";
             select_screen.set_screen(4);
-            select_screen.position();
-            if ((up and down) == true) {
-               lcd.clear();
-               screen = Screen::emergency;
-            }
+            
             if ((up and down).push_long()) {
                lcd.clear();
                screen = Screen::main;
+            } else if (select_screen.screen() == 1 and (up and down).click()) {
+               lcd.clear();
+               select_screen.set_position(1);
+               screen = Screen::emergency;
+            } else if (select_screen.screen() == 2 and (up and down).click()) {
+               lcd.clear();
+               select_screen.set_position(1);
+               screen = Screen::time_lamp;
+            } else if (select_screen.screen() == 3 and (up and down).click()) {
+               lcd.clear();
+               select_screen.set_position(1);
+               screen = Screen::configuration;
+            } else if (select_screen.screen() == 4 and (up and down).click()) {
+               lcd.clear();
+               select_screen.set_position(1);
+               screen = Screen::logs;
             }
+            // select_screen.position();
          break;
          case Screen::emergency:
             lcd.line(0) << "Нерабочие лампы";
             lcd.line(1) << "Ошибки линии RS485";
             lcd.line(2) << "Сбросить аварии";
-            if ((up and down).push_long())
+            select_screen.set_screen(3);
+            if ((up and down).push_long()) {
+               lcd.clear();
+               select_screen.set_position(1);
                screen = Screen::select;
+            }
          break;
          case Screen::time_lamp:
             lcd.line(0) << "Просмотр";
             lcd.line(1) << "Сброс наработки";
+            select_screen.set_screen(2);
+            if ((up and down).push_long()) {
+               lcd.clear();
+               select_screen.set_position(2);
+               screen = Screen::select;
+            }
          break;
          case Screen::configuration:
-            lcd.line(0) << "Просмотр конфигурации";
+            lcd.line(0) << "Просмотр конф-ции";
             lcd.line(1) << "Настройки";
-            lcd.line(2) << "Настройки конф";
-            lcd.line(2) << "Настройки сети";
+            lcd.line(2) << "Настройки конф-ции";
+            lcd.line(3) << "Настройки сети";
+            select_screen.set_screen(4);
+            if ((up and down).push_long()) {
+               lcd.clear();
+               select_screen.set_position(3);
+               screen = Screen::select;
+            }
          break;
          case Screen::logs:
             lcd.line(0) << "Просмотреть лог";
             lcd.line(1) << "Сбросить лог";
+            select_screen.set_screen(2);
+            if ((up and down).push_long()) {
+               lcd.clear();
+               select_screen.set_position(4);
+               screen = Screen::select;
+            }
          break;
       
       }
+      
+      if (screen != Screen::main)
+         select_screen.position();
       // if (up.push())
       //    lcd.line(0).center()  << "Hello, World!" << next_line;
       // else if (down.push())

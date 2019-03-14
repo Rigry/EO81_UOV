@@ -43,8 +43,10 @@ int main()
    while (1) {
 
       menu();
-      // led2 = up and down;
-      
+      // if (up.click())
+         // led2 ^= up.click();
+      // if (down.push_long())
+         // led2 = true;
       // process();
       // us_led = us ^= us_on;
       // uv_led = uv ^= uv_on;
