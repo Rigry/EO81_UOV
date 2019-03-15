@@ -1,27 +1,49 @@
 #pragma once
+#include <utility>
 #include "buttons.h"
+#include "function.h"
 #include "string_buffer.h"
 
+template <int qty>
 class Select_screen
 {
+   using Lines = std::pair<std::string_view, Function<void()>>;
+   
    size_t line{1};
    size_t qty_screen{0};
 
    Button& up;
    Button& down;
    String_buffer& lcd;
+   std::array<Lines, qty> lines;
 
 public:
 
-   Select_screen(Button& up,
-                 Button& down,
-                 String_buffer& lcd) 
-                 : up   {up}
-                 , down {down}
-                 , lcd  {lcd} {};
+   template <class ... Lines>
+   Select_screen( Button& up
+                , Button& down
+                , String_buffer& lcd
+                , Lines ... lines
+                ) 
+                : up   {up}
+                , down {down}
+                , lcd  {lcd}
+                , lines{lines...}
+   {}
 
-   void set_screen(size_t qty) {qty_screen = qty;}
+   void operator()()
+   {
+      for (auto i = 0; i < qty; i++) {
+         lcd.line(i) << lines[i];
+      }
+   }
+
+
+   void set_screen(size_t qty_) {qty_screen = qty_;}
    void set_position(size_t n) {line = n;}
+   bool exit(){return (up and down).push_long();}
+   bool menu(){return exit();}
+   bool next(){return (up and down).click();}
    void position() 
    {
       if (up.push()) { 
@@ -42,3 +64,7 @@ public:
 
    auto screen(){return line;}
 };
+
+// template <class ... Lines> 
+// Select_screen(Button&, Button&, String_buffer&, Lines... l) 
+// 	-> Select_screen<sizeof... (Lines)>;

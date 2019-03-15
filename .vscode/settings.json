@@ -43,6 +43,7 @@
       "typeinfo": "cpp",
       "utility": "cpp",
       "functional": "cpp",
-      "bitset": "cpp"
+      "bitset": "cpp",
+      "iostream": "cpp"
    }
 }
