@@ -46,8 +46,8 @@ class Menu
    Button& down;
    String_buffer& lcd;
    Select_screen<2> main_ {up, down, lcd
-      , std::pair {"Авария", []{}}
-      , std::pair {"Ht", []{}}  
+      , {"Авария", []{}}
+      , {"Ht", []{}}
    }; 
 
    Menu(Button& up, Button& down, String_buffer& lcd)

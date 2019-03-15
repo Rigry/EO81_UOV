@@ -4,10 +4,18 @@
 #include "function.h"
 #include "string_buffer.h"
 
+struct Lines {
+   std::string_view name;
+   Function<void()> callback;
+   Lines(std::string_view name, Function<void()> callback)
+      : name {name}
+      , callback {callback}
+   {}
+};
+
 template <int qty>
 class Select_screen
 {
-   using Lines = std::pair<std::string_view, Function<void()>>;
    
    size_t line{1};
    size_t qty_screen{0};
@@ -34,7 +42,7 @@ public:
    void operator()()
    {
       for (auto i = 0; i < qty; i++) {
-         lcd.line(i) << lines[i];
+         lcd.line(i) << lines[i].name;
       }
    }
 
