@@ -6,180 +6,85 @@
 #include "hd44780.h"
 #include "select_screen.h"
 
+template <class Up, class Down>
 class Menu 
 {
-   enum class Screen {
-      main, select, emergency, time_lamp, configuration, logs
-   } screen {Screen::main};
+public:
 
-   std::array<std::string_view, 27> model {
-      "УОВ-ПВ-1   ",    
-      "УОВ-ПВ-5   ",
-      "УОВ-ПВ-10  ",
-      "УОВ-ПВ-15  ",
-      "УОВ-ПВ-30  ",
-      "УОВ-ПВ-50  ",
-      "УОВ-ПВ-100 ",
-      "УОВ-ПВ-150 ",
-      "УОВ-ПВ-200 ",
-      "УОВ-ПВ-300 ",
-      "УОВ-ПВ-500 ",
-      "УОВ-ПВ-700 ",
-      "УОВ-ПВ-1000",
-      "УОВ-ПВ-1500",
-      "УОВ-СВ-5   ",
-      "УОВ-СВ-10  ",
-      "УОВ-СВ-15  ",
-      "УОВ-СВ-30  ",
-      "УОВ-СВ-50  ",
-      "УОВ-СВ-100 ",
-      "УОВ-СВ-150 ",
-      "УОВ-СВ-200 ",
-      "УОВ-СВ-300 ",
-      "УОВ-СВ-500 ",
-      "УОВ-СВ-700 ",
-      "УОВ-СВ-1000",
-      "УОВ-СВ-1500"  
-   };
-   
-   Button& up;
-   Button& down;
-   String_buffer& lcd;
-   Select_screen<2> main_ {up, down, lcd
-      , {"Авария", []{}}
-      , {"Ht", []{}}
-   }; 
-
-   Menu(Button& up, Button& down, String_buffer& lcd)
-      : up   {up}
-      , down {down}
+   Menu(String_buffer& lcd)
+      : up   {mcu::Button::make<Up>()}
+      , down {mcu::Button::make<Down>()}
       , lcd  {lcd}
    {}
-
-public:
-   
-   template <class Up, class Down>
-   static auto& make(String_buffer& lcd)
-   {
-      static auto menu = Menu
-      {
-         mcu::Button::make<Up>(),
-         mcu::Button::make<Down>(),
-         lcd
-      };
-      // HD44780::make<RS, RW, E, DB4, DB5, DB6, DB7>(lcd.get_buffer());
-      // вывести главный экран
-      return menu;
-   }
 
    void operator() () {
 
       switch (screen) {
-         case Screen::main: main_();
+         case Select::main:
+            lcd.clear();
+            lcd.line(0).center() << make_model[0] << model_type[3];
+            lcd.line(1) << "Ламп:" << modbus_qty_lamp;
+            lcd.line(2) << "Авария:никаких";
+            lcd.line(3).cursor(0) << "t"; lcd.cursor(1).width(3) << modbus_temp << "C";
+            lcd.line(3).cursor(8) << "УФ";
+            lcd.line(3).cursor(14)<< "УЗ";
+            if ((up and down).push_long())
+               screen = Select::select;
          break;
-         case Screen::select:
+         case Select::select:
+            select_screen([&]{screen = Select::main;});
          break;
-         case Screen::emergency:
+         case Select::emergency:
+            emergency_screen([&]{screen = Select::select;});
          break;
-         case Screen::time_lamp:
+         case Select::time_lamp:
+            time_lamp_screen([&]{screen = Select::select;});
          break;
-         case Screen::configuration:
+         case Select::configuration:
+            config_screen([&](){screen = Select::select;});
          break;
-         case Screen::logs:
+         case Select::logs:
+            log_screen([&](){screen = Select::select;});
          break;
 
       }
-      
-      // switch (screen)
-      // {
-      //    case Screen::main:
-      //       lcd.line(0).center() << "Контроллер УОВ";
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          screen = Screen::select;
-      //       }
-      //    break;
-      //    case Screen::select:
-      //       lcd.line(0) << "Аварии";
-      //       lcd.line(1) << "Наработка";
-      //       lcd.line(2) << "Конфигурация";
-      //       lcd.line(3) << "Лог работы";
-      //       select_screen.set_screen(4);
-            
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          screen = Screen::main;
-      //       } else if (select_screen.screen() == 1 and select_screen.next()) {
-      //          lcd.clear();
-      //          select_screen.set_position(1);
-      //          screen = Screen::emergency;
-      //       } else if (select_screen.screen() == 2 and select_screen.next()) {
-      //          lcd.clear();
-      //          select_screen.set_position(1);
-      //          screen = Screen::time_lamp;
-      //       } else if (select_screen.screen() == 3 and select_screen.next()) {
-      //          lcd.clear();
-      //          select_screen.set_position(1);
-      //          screen = Screen::configuration;
-      //       } else if (select_screen.screen() == 4 and select_screen.next()) {
-      //          lcd.clear();
-      //          select_screen.set_position(1);
-      //          screen = Screen::logs;
-      //       }
-      //       // select_screen.position();
-      //    break;
-      //    case Screen::emergency:
-      //       lcd.line(0) << "Нерабочие лампы";
-      //       lcd.line(1) << "Ошибки линии RS485";
-      //       lcd.line(2) << "Сбросить аварии";
-      //       select_screen.set_screen(3);
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          select_screen.set_position(1);
-      //          screen = Screen::select;
-      //       }
-      //    break;
-      //    case Screen::time_lamp:
-      //       lcd.line(0) << "Просмотр";
-      //       lcd.line(1) << "Сброс наработки";
-      //       select_screen.set_screen(2);
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          select_screen.set_position(2);
-      //          screen = Screen::select;
-      //       }
-      //    break;
-      //    case Screen::configuration:
-      //       lcd.line(0) << "Просмотр конф-ции";
-      //       lcd.line(1) << "Настройки";
-      //       lcd.line(2) << "Настройки конф-ции";
-      //       lcd.line(3) << "Настройки сети";
-      //       select_screen.set_screen(4);
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          select_screen.set_position(3);
-      //          screen = Screen::select;
-      //       }
-      //    break;
-      //    case Screen::logs:
-      //       lcd.line(0) << "Просмотреть лог";
-      //       lcd.line(1) << "Сбросить лог";
-      //       select_screen.set_screen(2);
-      //       if (select_screen.exit()) {
-      //          lcd.clear();
-      //          select_screen.set_position(4);
-      //          screen = Screen::select;
-      //       }
-      //    break;
-      
-      // }
-      
-      // if (screen != Screen::main)
-      //    select_screen.position();
-      // if (up.push())
-      //    lcd.line(0).center()  << "Hello, World!" << next_line;
-      // else if (down.push())
-      //    lcd.line(0).center() << "Alex_Plus";
    }
+
+private:
+   enum class Select {
+      main, select, emergency, time_lamp, configuration, logs
+   } screen {Select::main};
+
+   std::array<int, 14> model_type {   1,   5,  10,  15,  30,  50,   100, 
+                                    150, 200, 300, 500, 700, 1000, 1500};
+   std::array<std::string_view, 2> make_model {"УОВ-ПВ-", "УОВ-СВ-"};
+ 
+   Button up;
+   Button down;
+   String_buffer& lcd;
+   
+   Screen<4>select_screen    {up, down, lcd
+                            ,std::pair{"Аварии"      ,[&]{screen = Select::emergency;    }}
+                            ,std::pair{"Наработка"   ,[&]{screen = Select::time_lamp;    }}
+                            ,std::pair{"Конфигурация",[&]{screen = Select::configuration;}}
+                            ,std::pair{"Лог работы"  ,[&]{screen = Select::logs;         }} };
+   Screen<3>emergency_screen{up, down, lcd
+                            ,std::pair{"Нерабочие лампы"   ,[&](){}}
+                            ,std::pair{"Ошибки линии RS485",[&](){}}
+                            ,std::pair{"Сбросить аварии"   ,[&](){}} };
+   Screen<2>time_lamp_screen{up, down, lcd
+                            ,std::pair{"Просмотр"       ,[&](){}}
+                            ,std::pair{"Сброс наработки",[&](){}} };
+   Screen<4>config_screen   {up, down, lcd
+                            ,std::pair{"Просмотр конф-ции" ,[&](){}}
+                            ,std::pair{"Настройки"         ,[&](){}}
+                            ,std::pair{"Настройки конф-ции",[&](){}}
+                            ,std::pair{"Настройки сети"    ,[&](){}} };
+   Screen<2>log_screen      {up, down, lcd
+                            ,std::pair{"Просмотреть лог",[&](){}}
+                            ,std::pair{"Сбросить лог"   ,[&](){}} };
+
+   size_t modbus_qty_lamp {9};
+   size_t modbus_temp {25};
 
 };

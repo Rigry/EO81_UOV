@@ -4,75 +4,67 @@
 #include "function.h"
 #include "string_buffer.h"
 
-struct Lines {
-   std::string_view name;
-   Function<void()> callback;
-   Lines(std::string_view name, Function<void()> callback)
-      : name {name}
-      , callback {callback}
-   {}
-};
-
 template <int qty>
-class Select_screen
+class Screen
 {
-   
-   size_t line{1};
-   size_t qty_screen{0};
+public:
+   template <class...Lines>
+   Screen(Button& up, Button& down, String_buffer& lcd
+         , Lines ... lines
+         ) 
+         : up   {up}
+         , down {down}
+         , lcd  {lcd}
+         , lines{lines...}
+   {}
+
+   void operator()(Function<void()> f)
+   {
+      lcd.clear();
+      for (int i = 0; i < qty; i++) {
+         lcd.line(i) << lines[i].first;
+      }
+      if (next())
+         lines[carriage].second();
+      if (back()) {
+         f();
+         carriage = 0;
+      }
+
+      if (up.push()) { 
+         carriage -= 1;
+         if (carriage < 0) carriage = qty - 1;
+      }
+      if (down.push()) {
+         carriage += 1;
+         if (carriage >= qty) carriage = 0;
+      } 
+      for (int i = 0; i < qty; i++)
+      {
+         lcd.line(i).cursor(19) << " ";
+         if (i == carriage)
+            lcd.line(i).cursor(19) << "~";
+      }
+
+   }
+private:
+
+   using Lines = std::pair<std::string_view, Function<void()>>;
 
    Button& up;
    Button& down;
    String_buffer& lcd;
    std::array<Lines, qty> lines;
-
-public:
-
-   template <class ... Lines>
-   Select_screen( Button& up
-                , Button& down
-                , String_buffer& lcd
-                , Lines ... lines
-                ) 
-                : up   {up}
-                , down {down}
-                , lcd  {lcd}
-                , lines{lines...}
-   {}
-
-   void operator()()
-   {
-      for (auto i = 0; i < qty; i++) {
-         lcd.line(i) << lines[i].name;
-      }
-   }
-
-
-   void set_screen(size_t qty_) {qty_screen = qty_;}
-   void set_position(size_t n) {line = n;}
-   bool exit(){return (up and down).push_long();}
-   bool menu(){return exit();}
+   bool back(){return (up and down).push_long();}
    bool next(){return (up and down).click();}
-   void position() 
-   {
-      if (up.push()) { 
-         line -= 1;
-         if (line < 1) line = qty_screen;
-      }
-      if (down.push()) {
-         line += 1;
-         if (line > qty_screen) line = 1;
-      } 
-      for (size_t i = 1; i <= qty_screen; i++)
-      {
-         lcd.line(i-1).cursor(19) << " ";
-         if (i == line)
-            lcd.line(i-1).cursor(19) << "~";
-      } 
-   }
+   int carriage{0};
 
-   auto screen(){return line;}
 };
-
-// template <class ... Lines> 
-// Select_screen(Button&, Button&, String_buffer&, Lines... l) 
-// 	-> Select_screen<sizeof... (Lines)>;
+// struct Lines {
+//       std::string_view name;
+//       int callback;
+//       // Lines(std::string_view name, int callback)
+//       //    : name {name}
+//       //    , callback {callback}
+//       // {}
+//    };
