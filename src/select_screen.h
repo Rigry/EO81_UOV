@@ -7,10 +7,6 @@
 struct Line {
       std::string_view name;
       Function<void()> callback;
-      // Lines(std::string_view name, int callback)
-      //    : name {name}
-      //    , callback {callback}
-      // {}
    };
 
 template <int qty>
@@ -40,14 +36,10 @@ public:
          carriage = 0;
       }
 
-      if (up.push()) { 
-         carriage -= 1;
-         if (carriage < 0) carriage = qty - 1;
-      }
-      if (down.push()) {
-         carriage += 1;
-         if (carriage >= qty) carriage = 0;
-      } 
+      carriage = up.push()   ? carriage < 1 ? qty - 1  : carriage - 1 :
+                 down.push() ? carriage >= qty - 1 ? 0 : carriage + 1 :
+                 carriage;
+
       for (int i = 0; i < qty; i++)
       {
          lcd.line(i).cursor(19) << " ";
@@ -57,8 +49,6 @@ public:
 
    }
 private:
-
-//    using Lines = std::pair<std::string_view, Function<void()>>;
 
    Button& up;
    Button& down;
