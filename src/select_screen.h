@@ -4,28 +4,37 @@
 #include "function.h"
 #include "string_buffer.h"
 
+struct Line {
+      std::string_view name;
+      Function<void()> callback;
+      // Lines(std::string_view name, int callback)
+      //    : name {name}
+      //    , callback {callback}
+      // {}
+   };
+
 template <int qty>
 class Screen
 {
 public:
-   template <class...Lines>
+   template <class...Line>
    Screen(Button& up, Button& down, String_buffer& lcd
-         , Lines ... lines
+         , Line ... lines
          ) 
          : up   {up}
          , down {down}
          , lcd  {lcd}
-         , lines{lines...}
+         , lines {lines...}
    {}
 
    void operator()(Function<void()> f)
    {
       lcd.clear();
       for (int i = 0; i < qty; i++) {
-         lcd.line(i) << lines[i].first;
+         lcd.line(i) << lines[i].name;
       }
       if (next())
-         lines[carriage].second();
+         lines[carriage].callback();
       if (back()) {
          f();
          carriage = 0;
@@ -49,22 +58,14 @@ public:
    }
 private:
 
-   using Lines = std::pair<std::string_view, Function<void()>>;
+//    using Lines = std::pair<std::string_view, Function<void()>>;
 
    Button& up;
    Button& down;
    String_buffer& lcd;
-   std::array<Lines, qty> lines;
+   std::array<Line, qty> lines;
    bool back(){return (up and down).push_long();}
    bool next(){return (up and down).click();}
    int carriage{0};
 
 };
-// struct Lines {
-//       std::string_view name;
-//       int callback;
-//       // Lines(std::string_view name, int callback)
-//       //    : name {name}
-//       //    , callback {callback}
-//       // {}
-//    };

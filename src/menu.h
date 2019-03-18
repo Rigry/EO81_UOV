@@ -55,7 +55,7 @@ private:
       main, select, emergency, time_lamp, configuration, logs
    } screen {Select::main};
 
-   std::array<int, 14> model_type {   1,   5,  10,  15,  30,  50,   100, 
+   std::array<int, 14> model_type {   1,   5,  10,  15,  30,  50,   100,
                                     150, 200, 300, 500, 700, 1000, 1500};
    std::array<std::string_view, 2> make_model {"УОВ-ПВ-", "УОВ-СВ-"};
  
@@ -64,25 +64,25 @@ private:
    String_buffer& lcd;
    
    Screen<4>select_screen    {up, down, lcd
-                            ,std::pair{"Аварии"      ,[&]{screen = Select::emergency;    }}
-                            ,std::pair{"Наработка"   ,[&]{screen = Select::time_lamp;    }}
-                            ,std::pair{"Конфигурация",[&]{screen = Select::configuration;}}
-                            ,std::pair{"Лог работы"  ,[&]{screen = Select::logs;         }} };
+                            ,Line {"Аварии"      ,[&]{screen = Select::emergency;    }}
+                            ,Line {"Наработка"   ,[&]{screen = Select::time_lamp;    }}
+                            ,Line {"Конфигурация",[&]{screen = Select::configuration;}}
+                            ,Line {"Лог работы"  ,[&]{screen = Select::logs;         }} };
    Screen<3>emergency_screen{up, down, lcd
-                            ,std::pair{"Нерабочие лампы"   ,[&](){}}
-                            ,std::pair{"Ошибки линии RS485",[&](){}}
-                            ,std::pair{"Сбросить аварии"   ,[&](){}} };
+                            ,Line {"Нерабочие лампы"   ,[&](){}}
+                            ,Line {"Ошибки линии RS485",[&](){}}
+                            ,Line {"Сбросить аварии"   ,[&](){}} };
    Screen<2>time_lamp_screen{up, down, lcd
-                            ,std::pair{"Просмотр"       ,[&](){}}
-                            ,std::pair{"Сброс наработки",[&](){}} };
+                            ,Line {"Просмотр"       ,[&](){}}
+                            ,Line {"Сброс наработки",[&](){}} };
    Screen<4>config_screen   {up, down, lcd
-                            ,std::pair{"Просмотр конф-ции" ,[&](){}}
-                            ,std::pair{"Настройки"         ,[&](){}}
-                            ,std::pair{"Настройки конф-ции",[&](){}}
-                            ,std::pair{"Настройки сети"    ,[&](){}} };
+                            ,Line {"Просмотр конф-ции" ,[&](){}}
+                            ,Line {"Настройки"         ,[&](){}}
+                            ,Line {"Настройки конф-ции",[&](){}}
+                            ,Line {"Настройки сети"    ,[&](){}} };
    Screen<2>log_screen      {up, down, lcd
-                            ,std::pair{"Просмотреть лог",[&](){}}
-                            ,std::pair{"Сбросить лог"   ,[&](){}} };
+                            ,Line {"Просмотреть лог",[&](){}}
+                            ,Line {"Сбросить лог"   ,[&](){}} };
 
    size_t modbus_qty_lamp {9};
    size_t modbus_temp {25};
