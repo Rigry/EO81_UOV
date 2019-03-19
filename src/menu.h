@@ -63,11 +63,13 @@ private:
    Button down;
    String_buffer& lcd;
    
-   Screen<4>select_screen    {up, down, lcd
+   Screen<6>select_screen    {up, down, lcd
                             ,Line {"Аварии"      ,[&]{screen = Select::emergency;    }}
                             ,Line {"Наработка"   ,[&]{screen = Select::time_lamp;    }}
                             ,Line {"Конфигурация",[&]{screen = Select::configuration;}}
-                            ,Line {"Лог работы"  ,[&]{screen = Select::logs;         }} };
+                            ,Line {"Лог работы"  ,[&]{screen = Select::logs;         }}
+                            ,Line {"Настройки"   ,[&]{screen = Select::configuration;}}
+                            ,Line {"Наработка"   ,[&]{screen = Select::time_lamp    ;}} };
    Screen<3>emergency_screen{up, down, lcd
                             ,Line {"Нерабочие лампы"   ,[&](){}}
                             ,Line {"Ошибки линии RS485",[&](){}}
