@@ -1,3 +1,4 @@
 build/*
 !/build/EO81v2.hex
 !/build/EO81v2.bin
+.vscode/ipch

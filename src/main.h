@@ -4,7 +4,7 @@
 
 #include "bit_set.h"
 #include "pin.h"
-#include "buttons.h"
+#include "button.h"
 #include "modbus_slave.h"
 #include "modbus_master.h"
 #include "hysteresis.h"

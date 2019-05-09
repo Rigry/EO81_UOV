@@ -63,26 +63,26 @@ private:
    Button down;
    String_buffer& lcd;
    
-   Screen<6>select_screen    {up, down, lcd
+   Select_screen<6>select_screen    {up, down, lcd
                             ,Line {"Аварии"      ,[&]{screen = Select::emergency;    }}
                             ,Line {"Наработка"   ,[&]{screen = Select::time_lamp;    }}
                             ,Line {"Конфигурация",[&]{screen = Select::configuration;}}
                             ,Line {"Лог работы"  ,[&]{screen = Select::logs;         }}
                             ,Line {"Настройки"   ,[&]{screen = Select::configuration;}}
                             ,Line {"Наработка"   ,[&]{screen = Select::time_lamp    ;}} };
-   Screen<3>emergency_screen{up, down, lcd
+   Select_screen<3>emergency_screen{up, down, lcd
                             ,Line {"Нерабочие лампы"   ,[&](){}}
                             ,Line {"Ошибки линии RS485",[&](){}}
                             ,Line {"Сбросить аварии"   ,[&](){}} };
-   Screen<2>time_lamp_screen{up, down, lcd
+   Select_screen<2>time_lamp_screen{up, down, lcd
                             ,Line {"Просмотр"       ,[&](){}}
                             ,Line {"Сброс наработки",[&](){}} };
-   Screen<4>config_screen   {up, down, lcd
+   Select_screen<4>config_screen   {up, down, lcd
                             ,Line {"Просмотр конф-ции" ,[&](){}}
                             ,Line {"Настройки"         ,[&](){}}
                             ,Line {"Настройки конф-ции",[&](){}}
                             ,Line {"Настройки сети"    ,[&](){}} };
-   Screen<2>log_screen      {up, down, lcd
+   Select_screen<2>log_screen      {up, down, lcd
                             ,Line {"Просмотреть лог",[&](){}}
                             ,Line {"Сбросить лог"   ,[&](){}} };
 
