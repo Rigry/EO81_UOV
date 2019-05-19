@@ -33,7 +33,7 @@ constexpr auto models = std::array{
     "УОВ-СВ-1500" 
 };
 
-constexpr std::string_view models_to_string(int i) {
+constexpr std::string_view model_to_string(int i) {
     return models[i];
 }
 
