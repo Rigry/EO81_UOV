@@ -71,13 +71,14 @@ struct Menu : TickSubscriber {
         , Line {"Тех. настройки"    ,[this]{ change_screen(tech_select);  }}
     };
 
-    Select_screen<4> rs485_select {
+    Select_screen<5> rs485_select {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(config_select);  }}
         , Line {"Адрес"       ,[this]{ change_screen(address_set);    }}
         , Line {"Скорость"    ,[this]{ change_screen(boudrate_set);   }}
-        , Line {"Проверка"    ,[]{}}
-        , Line {"Стоп биты"   ,[]{}}
+        , Line {"Проверка"    ,[this]{ change_screen(parity_en_set);  }}
+        , Line {"Тип проверки",[this]{ change_screen(parity_set);     }}
+        , Line {"Стоп биты"   ,[this]{ change_screen(stop_bits_set);  }}
     };
 
     Select_screen<4> tech_select {
@@ -116,6 +117,46 @@ struct Menu : TickSubscriber {
         , "Скорость в бодах"
         , boudrate_
         , 0, ::boudrate.size()
+    };
+
+    uint8_t parity_enable_ {flash.uart_set.parity_enable};
+    Set_screen<uint8_t, exist_to_string> parity_en_set {
+          lcd, buttons_events
+        , Out_callback    { [this]{ 
+            flash.uart_set.parity_enable = bool(parity_enable_);
+            change_screen(rs485_select);
+        }}
+        , "Проверка на чет/нечет"
+        , parity_enable_
+        , 0, exist.size()
+    };
+
+    uint8_t parity_ {flash.uart_set.parity};
+    Set_screen<uint8_t, parity_to_string> parity_set {
+          lcd, buttons_events
+        , Out_callback    { [this]{ 
+            flash.uart_set.parity = USART::Parity(parity_);
+            change_screen(rs485_select);
+        }}
+        , "Проверка на"
+        , parity_
+        , 0, parity.size()
+    };
+
+    int stop_bits {flash.uart_set.stop_bits == USART::StopBits::_1 ? 1 : 2};
+    Set_screen<int, parity_to_string> stop_bits_set {
+          lcd, buttons_events
+        , Out_callback    { [this]{ 
+            flash.uart_set.stop_bits = 
+                stop_bits == 1 
+                ? USART::StopBits::_1 
+                : USART::StopBits::_2
+            ;
+            change_screen(rs485_select);
+        }}
+        , "Количество стоп бит"
+        , stop_bits
+        , 1, 2
     };
 
     Set_screen<int, model_to_string> name_set {
