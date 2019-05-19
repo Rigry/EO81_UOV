@@ -10,6 +10,7 @@
 #include "menu.h"
 #include "button.h"
 #include "modbus_slave.h"
+#include "modbus_master.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -30,6 +31,8 @@ using DB7   = mcu::PB7;
 using Up    = mcu::PB8;
 using Down  = mcu::PB9;
 using US    = mcu::PB0; 
+
+
 
 int main()
 {
@@ -99,6 +102,50 @@ int main()
     modbus_slave.inRegsMin.qty_uv_lamps    = 0;
     modbus_slave.inRegsMax.qty_uv_lamps    = 10;
 
+    struct {
+        Register<1,  Modbus_function::read_03, 0> qty_lamps_1;
+        Register<2,  Modbus_function::read_03, 0> qty_lamps_2;
+        Register<3,  Modbus_function::read_03, 0> qty_lamps_3;
+        Register<4,  Modbus_function::read_03, 0> qty_lamps_4;
+        Register<5,  Modbus_function::read_03, 0> qty_lamps_5;
+        Register<6,  Modbus_function::read_03, 0> qty_lamps_6;
+        Register<7,  Modbus_function::read_03, 0> qty_lamps_7;
+        Register<8,  Modbus_function::read_03, 0> qty_lamps_8;
+        Register<9,  Modbus_function::read_03, 0> qty_lamps_9;
+        Register<10, Modbus_function::read_03, 0> qty_lamps_10;
+        Register<11, Modbus_function::read_03, 0> qty_lamps_11;
+        Register<12, Modbus_function::read_03, 0> qty_lamps_12;
+        Register<13, Modbus_function::read_03, 0> qty_lamps_13;
+        Register<14, Modbus_function::read_03, 0> qty_lamps_14;
+        Register<15, Modbus_function::read_03, 0> qty_lamps_15;
+
+        Register<1,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_1;
+        Register<2,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_2;
+        Register<3,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_3;
+        Register<4,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_4;
+        Register<5,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_5;
+        Register<6,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_6;
+        Register<7,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_7;
+        Register<8,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_8;
+        Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
+        Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
+        Register<11, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_11;
+        Register<12, Modbus_function::read_03, 1> bad_lamps_12;
+        Register<13, Modbus_function::read_03, 1> bad_lamps_13;
+        Register<14, Modbus_function::read_03, 1> bad_lamps_14;
+        Register<15, Modbus_function::read_03, 1> bad_lamps_15;
+        
+        Register<16, Modbus_function::read_03, 0> uv_level;
+        Register<16, Modbus_function::read_03, 1> temperature;
+    } modbus_master_regs;
+
+    decltype(auto) modbus_master = make_modbus_master <
+          mcu::Periph::USART3
+        , TX_master
+        , RX_master
+        , RTS_master
+    > (50_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
+
     auto up    = Button<Up>();
     auto down  = Button<Down>();
     auto enter = Tied_buttons(up, down);
@@ -106,6 +153,8 @@ int main()
     [[maybe_unused]] auto _ = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs);
 
     while (1) {
+        modbus_master();
+        modbus_slave([](auto i){});
         __WFI();
     }
 
