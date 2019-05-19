@@ -15,9 +15,7 @@ RingBuffer<16> tmp;
 template<class Pins, class Flash_data>
 struct Menu : TickSubscriber {
     String_buffer lcd {};
-    HD44780& _ { 
-        HD44780::make(Pins{}, lcd.get_buffer())
-    };
+    HD44780& _ { HD44780::make(Pins{}, lcd.get_buffer()) };
     Button_event& up;
     Button_event& down;
     Button_event& enter;
@@ -67,11 +65,11 @@ struct Menu : TickSubscriber {
         , Down_event  { [this](auto c){ down.set_click_callback(c);}     }
         , Enter_event { [this](auto c){enter.set_click_callback(c);}     }
         , Out_event   { [this](auto c){enter.set_long_push_callback(c);} }
-        , Out_callback    { [this]{ change_screen(main_select);  }}
+        , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр конф.-ии" ,[]{}}
         , Line {"Тревога УФ"        ,[this]{ change_screen(min_UV_set);   }}
         , Line {"Настройка сети"    ,[this]{ change_screen(rs485_select); }}
-        , Line {"Тех. настройки"    ,[]{}}
+        , Line {"Тех. настройки"    ,[this]{ change_screen(tech_select);  }}
     };
     Select_screen<4> rs485_select {
           lcd
@@ -80,10 +78,22 @@ struct Menu : TickSubscriber {
         , Enter_event { [this](auto c){enter.set_click_callback(c);}     }
         , Out_event   { [this](auto c){enter.set_long_push_callback(c);} }
         , Out_callback    { [this]{ change_screen(config_select);  }}
-        , Line {"Адрес:     255"        ,[]{}}
-        , Line {"Скорость:  115200"     ,[]{}}
-        , Line {"Проверка:  отсутсв."   ,[]{}}
-        , Line {"Стоп биты: 1"          ,[]{}}
+        , Line {"Адрес"       ,[]{}}
+        , Line {"Скорость"    ,[]{}}
+        , Line {"Проверка"    ,[]{}}
+        , Line {"Стоп биты"   ,[]{}}
+    };
+    Select_screen<4> tech_select {
+          lcd
+        , Up_event    { [this](auto c){   up.set_click_callback(c);}     }
+        , Down_event  { [this](auto c){ down.set_click_callback(c);}     }
+        , Enter_event { [this](auto c){enter.set_click_callback(c);}     }
+        , Out_event   { [this](auto c){enter.set_long_push_callback(c);} }
+        , Out_callback    { [this]{ change_screen(config_select);  }}
+        , Line {"Наименование" ,[this]{ change_screen(name_set);   }}
+        , Line {"туду"   ,[]{}}
+        , Line {"туду"   ,[]{}}
+        , Line {"туду"   ,[]{}}
     };
     Set_screen<int> min_UV_set {
           lcd
@@ -94,6 +104,18 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(config_select);  }}
         , "уровень УФ"
         , flash.uv_level_min
+        , 1, 100
+    };
+    Set_screen<int, models_to_string> name_set {
+          lcd
+        , Up_event    { [this](auto c){   up.set_click_callback(c);}     }
+        , Down_event  { [this](auto c){ down.set_click_callback(c);}     }
+        , Enter_event { [this](auto c){enter.set_click_callback(c);}     }
+        , Out_event   { [this](auto c){enter.set_long_push_callback(c);} }
+        , Out_callback    { [this]{ change_screen(config_select);  }}
+        , "Наименование установки"
+        , flash.model_number
+        , 0, models.size()
     };
     
 
