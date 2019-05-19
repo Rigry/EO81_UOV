@@ -1,37 +1,37 @@
 #pragma once
 
-#define ADR(reg) GET_ADR(In_regs, reg)
+// #define ADR(reg) GET_ADR(In_regs, reg)
 
-#include "bit_set.h"
-#include "pin.h"
-#include "button.h"
-#include "modbus_slave.h"
-#include "modbus_master.h"
-#include "hysteresis.h"
+// #include "bit_set.h"
+// #include "pin.h"
+// #include "button.h"
+// #include "modbus_slave.h"
+// #include "modbus_master.h"
+// #include "hysteresis.h"
 
 
-using EPRA1  = mcu::PA0;        using E   = mcu::PB3;       
-using EPRA2  = mcu::PA1;        using RW  = mcu::PD2;       
-using EPRA3  = mcu::PA2;        using RS  = mcu::PC12;      
-using EPRA4  = mcu::PA3;        using DB4 = mcu::PB4;       
-using EPRA5  = mcu::PA4;        using DB5 = mcu::PB5;
-using EPRA6  = mcu::PA5;        using DB6 = mcu::PB6;    
-using EPRA7  = mcu::PA6;        using DB7 = mcu::PB7;
-using EPRA8  = mcu::PA7;
-using EPRA9  = mcu::PC4;
-using EPRA10 = mcu::PC5;
+// using EPRA1  = mcu::PA0;        using E   = mcu::PB3;       
+// using EPRA2  = mcu::PA1;        using RW  = mcu::PD2;       
+// using EPRA3  = mcu::PA2;        using RS  = mcu::PC12;      
+// using EPRA4  = mcu::PA3;        using DB4 = mcu::PB4;       
+// using EPRA5  = mcu::PA4;        using DB5 = mcu::PB5;
+// using EPRA6  = mcu::PA5;        using DB6 = mcu::PB6;    
+// using EPRA7  = mcu::PA6;        using DB7 = mcu::PB7;
+// using EPRA8  = mcu::PA7;
+// using EPRA9  = mcu::PC4;
+// using EPRA10 = mcu::PC5;
 
-using BTN_UP   = mcu::PB8;      using LED1 = mcu::PB12;
-using BTN_DOWN = mcu::PB9;      using LED2 = mcu::PC6;
-using BTN_UF   = mcu::PB1;      using LED3 = mcu::PC7;
-using BTN_UZG  = mcu::PB0;      using LED4 = mcu::PA12;
-using R_UF     = mcu::PB10;     using LED5 = mcu::PC9;
-using R_UZG    = mcu::PB11;
+// using BTN_UP   = mcu::PB8;      using LED1 = mcu::PB12;
+// using BTN_DOWN = mcu::PB9;      using LED2 = mcu::PC6;
+// using BTN_UF   = mcu::PB1;      using LED3 = mcu::PC7;
+// using BTN_UZG  = mcu::PB0;      using LED4 = mcu::PA12;
+// using R_UF     = mcu::PB10;     using LED5 = mcu::PC9;
+// using R_UZG    = mcu::PB11;
 
-using TX_master  = mcu::PC10;   using TX_slave  = mcu::PA9;
-using RX_master  = mcu::PC11;   using RX_slave  = mcu::PA10;
-using RTS_master = mcu::PA15;   using RTS_slave = mcu::PA8;
-using LED_master = mcu::PC9;    using LED_slave = mcu::PA12;
+// using TX_master  = mcu::PC10;   using TX_slave  = mcu::PA9;
+// using RX_master  = mcu::PC11;   using RX_slave  = mcu::PA10;
+// using RTS_master = mcu::PA15;   using RTS_slave = mcu::PA8;
+// using LED_master = mcu::PC9;    using LED_slave = mcu::PA12;
 
 
 // void process()
