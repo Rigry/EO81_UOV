@@ -12,7 +12,7 @@ RingBuffer<16> tmp;
 
 
 
-template<class Pins, class Flash_data>
+template<class Pins, class Flash_data, class Modbus_regs>
 struct Menu : TickSubscriber {
     String_buffer lcd {};
     HD44780& _ { HD44780::make(Pins{}, lcd.get_buffer()) };
@@ -20,6 +20,8 @@ struct Menu : TickSubscriber {
     Button_event& down;
     Button_event& enter;
     Flash_data&   flash;
+    Modbus_regs&  modbus;
+
     Screen* current_screen {&main_screen};
     size_t tick_count{0};
 
@@ -31,8 +33,14 @@ struct Menu : TickSubscriber {
     };
 
 
-    Menu (Pins pins, Button_event& up, Button_event& down, Button_event& enter,  Flash_data& flash)
-        : up{up}, down{down}, enter{enter}, flash{flash}
+    Menu (
+        Pins pins
+        , Button_event& up
+        , Button_event& down
+        , Button_event& enter
+        , Flash_data&   flash
+        , Modbus_regs&  modbus
+    ) : up{up}, down{down}, enter{enter}, flash{flash}, modbus{modbus}
     {
         tick_subscribe();
         current_screen->init();
@@ -43,6 +51,9 @@ struct Menu : TickSubscriber {
         , Enter_event  { [this](auto c){enter.set_click_callback(c);}     }
         , Out_callback { [this]{ change_screen(main_select); }}
         , flash.model_number
+        , modbus.temperature
+        , modbus.uv_level
+        , modbus.qty_uv_lamps
     };
 
     Select_screen<4> main_select {

@@ -77,29 +77,45 @@ struct Main_screen : Screen {
     Eventer enter_event;
     Callback<> out_callback;
     int& model_n;
+    uint16_t& temperatura;
+    uint16_t& uv_level;
+    uint16_t& lamps_qty;
 
     Main_screen(
           String_buffer& lcd
         , Enter_event enter_event
         , Out_callback out_callback
         , int& model_n
+        , uint16_t& temperatura
+        , uint16_t& uv_level
+        , uint16_t& lamps_qty
     ) : lcd          {lcd}
       , enter_event  {enter_event.value}
       , out_callback {out_callback.value}
       , model_n      {model_n}
+      , temperatura  {temperatura}
+      , uv_level     {uv_level}
+      , lamps_qty    {lamps_qty}
     {}
+
     void init() override {
         enter_event ([this]{ out_callback(); });
         lcd.clear();
         lcd.line(0).center() << models[model_n];
-        lcd << "счет: " << next_line;
+
+        lcd.line(1) << "Ламп:" << lamps_qty;
+        lcd.line(2) << "Авария:никаких" << next_line;
+        lcd         << "t"; 
+        lcd.width(3) << temperatura << "C";
+        lcd.line(3).cursor(8) << "УФ";
+        lcd.line(3).cursor(14)<< "УЗ";
     }
+    
     void deinit() override {
         enter_event (null_function);
     }
 
-    int placeholder {0};
     void draw() override {
-        lcd.line(2) << placeholder++;
+        lcd.line(3).cursor(3).width(3) << temperatura;
     }
 };
