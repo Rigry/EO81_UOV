@@ -11,6 +11,8 @@
 #include "button.h"
 #include "modbus_slave.h"
 #include "modbus_master.h"
+#include "hysteresis.h"
+#include "utils.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -21,16 +23,23 @@ using RX_master  = mcu::PC11;   using RX_slave  = mcu::PA10;
 using RTS_master = mcu::PA15;   using RTS_slave = mcu::PA8;
 using LED_master = mcu::PC9;    using LED_slave = mcu::PA12;
 
-using E     = mcu::PB3;       
-using RW    = mcu::PD2;       
-using RS    = mcu::PC12;      
-using DB4   = mcu::PB4;       
-using DB5   = mcu::PB5;
-using DB6   = mcu::PB6;    
-using DB7   = mcu::PB7;
-using Up    = mcu::PB8;
-using Down  = mcu::PB9;
-using US    = mcu::PB0; 
+using E       = mcu::PB3;
+using RW      = mcu::PD2;
+using RS      = mcu::PC12;
+using DB4     = mcu::PB4;
+using DB5     = mcu::PB5;
+using DB6     = mcu::PB6;
+using DB7     = mcu::PB7;
+using Up      = mcu::PB8;
+using Down    = mcu::PB9;
+using US_BTN  = mcu::PB0;
+using UV_BTN  = mcu::PB1;
+using UV_CTRL = mcu::PB10;
+using US_CTRL = mcu::PB11;
+
+using LED1 = mcu::PB12;
+using LED2 = mcu::PC6;
+using LED3 = mcu::PC7;
 
 
 
@@ -67,13 +76,20 @@ int main()
         std::array<uint16_t, 112> hours; // 8
     }__attribute__((packed));
 
+    struct Flags {
+        bool us_on        : 1;
+        bool uv_on        : 1;
+        bool uv_low_level : 1;
+        bool overheat     : 1;
+        uint16_t          :12;
+    };
 
     struct Out_regs {
         uint16_t       device_code;        // 0
         uint16_t       factory_number;     // 1
         UART::Settings uart_set;           // 2
         uint16_t       modbus_address;     // 3
-        uint16_t       work_flags;         // 4
+        Flags          work_flags;         // 4
         uint16_t       temperature;        // 5
         uint16_t       max_temperature;    // 6
         uint16_t       uv_level;           // 7
@@ -150,11 +166,70 @@ int main()
     auto down  = Button<Down>();
     auto enter = Tied_buttons(up, down);
     constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
-    [[maybe_unused]] auto _ = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs);
+    [[maybe_unused]] auto menu = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs);
+
+
+    // алиасы
+    auto& temperature = (uint16_t&)modbus_master_regs.temperature;
+    auto& uv_level    = (uint16_t&)modbus_master_regs.uv_level;
+    auto& work_flags = modbus_slave.outRegs.work_flags;
+
+
+    auto& alarm_led = Pin::make<LED3, mcu::PinMode::Output>();
+
+    auto overheat = Hysteresis(temperature, flash.temperature_recovery, flash.max_temperature);
+
+    // UV control
+    // TODO уточнить логику у Олега
+    auto& uv     = Pin::make<UV_CTRL, mcu::PinMode::Output>();
+    auto& uv_led = Pin::make<LED1   , mcu::PinMode::Output>();
+    auto  uv_button = Button<UV_BTN>();
+
+    auto on_uv = [&](bool on = true){
+        uv = uv_led = work_flags.us_on = on;
+    };
+
+    uv_button.set_down_callback([&]{
+        if (not work_flags.uv_on and not overheat)
+            on_uv();
+        else if (work_flags.uv_on)
+            on_uv(false);
+    });
+
+    // US control
+    // TODO уточнить логику у Олега
+    auto& us     = Pin::make<US_CTRL, mcu::PinMode::Output>();
+    auto& us_led = Pin::make<LED2   , mcu::PinMode::Output>();
+    auto  us_button = Button<US_BTN>();
+
+    auto on_us = [&](bool on = true){
+        us = us_led = work_flags.us_on = on;
+    };
+
+    us_button.set_down_callback([&]{
+        if (not work_flags.us_on and not overheat)
+            on_us();
+        else if (work_flags.us_on)
+            on_us(false);
+    });
 
     while (1) {
         // modbus_master(); // FIX зависает
         modbus_slave([](auto i){});
+
+        work_flags.overheat = overheat;
+
+        set_if_greater (flash.uv_level_highest, uv_level);
+        auto uv_level_percent = uv_level * 100 / flash.uv_level_highest;
+        work_flags.uv_low_level = uv_level_percent < flash.uv_level_min;
+        
+        if (work_flags.overheat) {
+            on_us(false);
+            on_uv(false);
+        }
+        // TODO add other alarms уточнить у Олега
+        alarm_led = work_flags.overheat or work_flags.uv_low_level;
+
         __WFI();
     }
 

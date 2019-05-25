@@ -15,7 +15,7 @@ RingBuffer<16> tmp;
 template<class Pins, class Flash_data, class Modbus_regs>
 struct Menu : TickSubscriber {
     String_buffer lcd {};
-    HD44780& _ { HD44780::make(Pins{}, lcd.get_buffer()) };
+    HD44780& hd44780 { HD44780::make(Pins{}, lcd.get_buffer()) };
     Button_event& up;
     Button_event& down;
     Button_event& enter;
