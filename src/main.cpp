@@ -153,7 +153,7 @@ int main()
     [[maybe_unused]] auto _ = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs);
 
     while (1) {
-        modbus_master();
+        // modbus_master(); // FIX зависает
         modbus_slave([](auto i){});
         __WFI();
     }

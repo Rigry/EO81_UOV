@@ -127,7 +127,7 @@ struct Menu : TickSubscriber {
         }}
         , "Скорость в бодах"
         , boudrate_
-        , 0, ::boudrate.size()
+        , 0, ::boudrate.size() - 1
     };
 
     uint8_t parity_enable_ {flash.uart_set.parity_enable};
@@ -139,7 +139,7 @@ struct Menu : TickSubscriber {
         }}
         , "Проверка на чет/нечет"
         , parity_enable_
-        , 0, exist.size()
+        , 0, exist.size() - 1
     };
 
     uint8_t parity_ {flash.uart_set.parity};
@@ -151,7 +151,7 @@ struct Menu : TickSubscriber {
         }}
         , "Проверка на"
         , parity_
-        , 0, parity.size()
+        , 0, parity.size() - 1
     };
 
     int stop_bits {flash.uart_set.stop_bits == USART::StopBits::_1 ? 1 : 2};
@@ -172,10 +172,10 @@ struct Menu : TickSubscriber {
 
     Set_screen<int, model_to_string> name_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ change_screen(config_select);  }}
-        , "Наименование установки"
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , "Наименование уст."
         , flash.model_number
-        , 0, models.size()
+        , 0, models.size() - 1
     };
     
 
@@ -189,8 +189,5 @@ struct Menu : TickSubscriber {
         current_screen->deinit();
         current_screen = &new_screen;
         current_screen->init();
-        auto i = new int;
-        tmp.push(uint32_t(i));
-        delete i;
     }
 };
