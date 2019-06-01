@@ -100,7 +100,8 @@ int main()
         std::array<uint16_t, 112> hours;   // 18
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
-    decltype(auto) modbus_slave = Modbus_slave<In_regs, Out_regs>::make <
+    // оптимизировал, неудобно отлаживать, потому volatile
+    volatile decltype(auto) modbus_slave = Modbus_slave<In_regs, Out_regs>::make <
           mcu::Periph::USART1
         , TX_slave
         , RX_slave
