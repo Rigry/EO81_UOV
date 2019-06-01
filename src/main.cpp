@@ -147,13 +147,14 @@ int main()
         Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
         Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
         Register<11, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_11;
-        Register<12, Modbus_function::read_03, 1> bad_lamps_12;
+        // Register<12, Modbus_function::read_03, 1> bad_lamps_12;
         Register<13, Modbus_function::read_03, 1> bad_lamps_13;
         Register<14, Modbus_function::read_03, 1> bad_lamps_14;
         Register<15, Modbus_function::read_03, 1> bad_lamps_15;
         
-        Register<16, Modbus_function::read_03, 0> uv_level;
-        Register<16, Modbus_function::read_03, 1> temperature;
+        // FIX 12 временно, при отладке была плата с таким адресом
+        Register<12, Modbus_function::read_03, 0> uv_level;
+        Register<12, Modbus_function::read_03, 1> temperature;
     } modbus_master_regs;
 
     decltype(auto) modbus_master = make_modbus_master <
@@ -161,7 +162,7 @@ int main()
         , TX_master
         , RX_master
         , RTS_master
-    > (50_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
+    > (500_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
 
     auto up    = Button<Up>();
     auto down  = Button<Down>();
@@ -173,6 +174,7 @@ int main()
     // алиасы
     auto& temperature = (uint16_t&)modbus_master_regs.temperature;
     auto& uv_level    = (uint16_t&)modbus_master_regs.uv_level;
+    auto& uv_level_percent = modbus_slave.outRegs.uv_level;
     auto& work_flags = modbus_slave.outRegs.work_flags;
 
 
@@ -215,13 +217,15 @@ int main()
     });
 
     while (1) {
-        // modbus_master(); // FIX зависает
-        modbus_slave([](auto i){});
+        modbus_master();
+        modbus_slave([](auto){});
+
+        modbus_slave.outRegs.temperature = temperature;
 
         work_flags.overheat = overheat;
 
         set_if_greater (flash.uv_level_highest, uv_level);
-        auto uv_level_percent = uv_level * 100 / flash.uv_level_highest;
+        uv_level_percent = uv_level * 100 / flash.uv_level_highest;
         work_flags.uv_low_level = uv_level_percent < flash.uv_level_min;
         
         if (work_flags.overheat) {
