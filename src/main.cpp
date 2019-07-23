@@ -13,6 +13,7 @@
 #include "modbus_master.h"
 #include "hysteresis.h"
 #include "utils.h"
+#include "flash.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -62,7 +63,9 @@ int main()
         uint16_t uv_level_highest      = 0x0100;
         int      model_number          = 0;
         uint16_t temperature_recovery  = 20;
-    } flash; // FIX (placeholder)
+    };
+
+    Flash<Flash_data, mcu::FLASH::Sector::_127, mcu::FLASH::Sector::_126> flash{};
 
     struct In_regs {
         UART::Settings uart_set;         // 0
@@ -73,7 +76,7 @@ int main()
         uint16_t uv_level_min;           // 5
         uint16_t qty_uv_lamps;           // 6
         uint16_t uv_level_highest;       // 7
-        std::array<uint16_t, 112> hours; // 8
+        std::array<uint16_t, 112> hours;  // 8
     }__attribute__((packed));
 
     struct Flags {

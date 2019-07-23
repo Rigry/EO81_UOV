@@ -106,7 +106,7 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(config_select);  }}
         , "уровень УФ"
         , flash.uv_level_min
-        , 1, 100
+        , Min<int>{1}, Max<int>{100}
     };
 
     Set_screen<uint8_t> address_set {
@@ -114,7 +114,7 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(rs485_select);  }}
         , "Адрес modbus"
         , flash.modbus_address
-        , 1, 255
+        , Min<uint8_t>{1}, Max<uint8_t>{255}
     };
 
     // приходится сохранять, так как нельзя сделать ссылку на член битового поля
@@ -127,7 +127,7 @@ struct Menu : TickSubscriber {
         }}
         , "Скорость в бодах"
         , boudrate_
-        , 0, ::boudrate.size() - 1
+        , Min<uint8_t>{0}, Max<uint8_t>{::boudrate.size() - 1}
     };
 
     uint8_t parity_enable_ {flash.uart_set.parity_enable};
@@ -139,7 +139,7 @@ struct Menu : TickSubscriber {
         }}
         , "Проверка на чет/нечет"
         , parity_enable_
-        , 0, exist.size() - 1
+        , Min<uint8_t>{0}, Max<uint8_t>{exist.size() - 1}
     };
 
     uint8_t parity_ {flash.uart_set.parity};
@@ -151,11 +151,11 @@ struct Menu : TickSubscriber {
         }}
         , "Проверка на"
         , parity_
-        , 0, parity.size() - 1
+        , Min<uint8_t>{0}, Max<uint8_t>{parity.size() - 1}
     };
 
     int stop_bits {flash.uart_set.stop_bits == USART::StopBits::_1 ? 1 : 2};
-    Set_screen<int, parity_to_string> stop_bits_set {
+    Set_screen<int> stop_bits_set {
           lcd, buttons_events
         , Out_callback    { [this]{ 
             flash.uart_set.stop_bits = 
@@ -167,7 +167,7 @@ struct Menu : TickSubscriber {
         }}
         , "Количество стоп бит"
         , stop_bits
-        , 1, 2
+        , Min<int>{1}, Max<int>{2}
     };
 
     Set_screen<int, model_to_string> name_set {
@@ -175,7 +175,7 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , "Наименование уст."
         , flash.model_number
-        , 0, models.size() - 1
+        , Min<int>{0}, Max<int>{models.size() - 1}
     };
     
 
