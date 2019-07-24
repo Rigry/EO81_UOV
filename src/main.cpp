@@ -221,7 +221,7 @@ int main()
     });
 
     // FIX delete, this for test bad lamps
-    modbus_slave.outRegs.qty_uv_lamps = 50;
+    modbus_slave.outRegs.qty_uv_lamps = 49;
     bool even {};
     for (auto i{0}; i < modbus_slave.outRegs.qty_uv_lamps; i++) {
         modbus_slave.outRegs.lamp[i] = even;
@@ -229,17 +229,11 @@ int main()
     }
 
     // FIX delete, this for test work time
-    modbus_slave.outRegs.qty_uv_lamps = 50;
+    modbus_slave.outRegs.qty_uv_lamps = 49;
     uint16_t hour {0};
-    even = false;
     for (auto i{0}; i < modbus_slave.outRegs.qty_uv_lamps; i++) {
         modbus_slave.outRegs.hours[i] = hour;
-        if (even) {
-            hour -= i;
-        } else {
-            hour += i;
-        }
-        even ^= 1;
+        hour -= 11111;
     }
 
     while (1) {

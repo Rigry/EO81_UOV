@@ -197,6 +197,11 @@ struct Work_time_screen : Screen {
 
     void draw() override {}
 
+    void set_first_lamp (int v) {
+        first_lamp = v;
+        first_lamp -= first_lamp % 2;
+    }
+
 private:
     int first_lamp {0};
 

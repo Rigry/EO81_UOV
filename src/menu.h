@@ -79,21 +79,40 @@ struct Menu : TickSubscriber {
         , modbus.lamp, modbus.qty_uv_lamps
     };
 
-    Select_screen<2> work_select {
+    Select_screen<3> work_select {
           lcd, buttons_events
         , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс всех ламп   ",[this]{
-            for(auto& hour : modbus.hours)
+            for(auto& hour : modbus.hours) // TODO ещё во flash
                 hour = 0;
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
+        , Line {"Сброс одной лампы",[this]{ 
+            reset_n_set.max = modbus.qty_uv_lamps;
+            change_screen(reset_n_set);
+        }}
+
     };
 
     Work_time_screen work_time_screen {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(work_select);  }}
         , modbus.hours, modbus.qty_uv_lamps
+    };
+
+    int reset_n {1};
+    Set_screen<int> reset_n_set {
+          lcd, buttons_events
+        , "N лампы для сброса"
+        , reset_n
+        , Min<int>{1}, Max<int>{1}
+        , Out_callback      { [this]{ change_screen(work_select);  }}
+        , Enter_callback    { [this]{
+            modbus.hours[reset_n-1] = 0; // TODO во флэше тоже
+            work_time_screen.set_first_lamp(reset_n-1);
+            change_screen(work_time_screen);
+        }}
     };
 
     Select_screen<4> config_select {
@@ -126,60 +145,68 @@ struct Menu : TickSubscriber {
 
     Set_screen<int> min_UV_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ change_screen(config_select);  }}
         , "уровень УФ"
         , flash.uv_level_min
         , Min<int>{1}, Max<int>{100}
+        , Out_callback    { [this]{ change_screen(config_select);  }}
+        , Enter_callback  {nullptr}
     };
 
     Set_screen<uint8_t> address_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ change_screen(rs485_select);  }}
         , "Адрес modbus"
         , flash.modbus_address
         , Min<uint8_t>{1}, Max<uint8_t>{255}
+        , Out_callback    { [this]{ change_screen(rs485_select);  }}
+        , Enter_callback  {nullptr}
     };
 
     // приходится сохранять, так как нельзя сделать ссылку на член битового поля
     uint8_t boudrate_ {flash.uart_set.baudrate};
     Set_screen<uint8_t, boudrate_to_string> boudrate_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ 
-            flash.uart_set.baudrate = USART::Baudrate(boudrate_);
-            change_screen(rs485_select);
-        }}
         , "Скорость в бодах"
         , boudrate_
         , Min<uint8_t>{0}, Max<uint8_t>{::boudrate.size() - 1}
+        , Out_callback    { [this]{ 
+            flash.uart_set.baudrate = USART::Baudrate(boudrate_);
+            change_screen(rs485_select);
+        }} // FIX its enter callback
+        , Enter_callback  {nullptr}
     };
 
     uint8_t parity_enable_ {flash.uart_set.parity_enable};
     Set_screen<uint8_t, exist_to_string> parity_en_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ 
-            flash.uart_set.parity_enable = bool(parity_enable_);
-            change_screen(rs485_select);
-        }}
         , "Проверка на чет/нечет"
         , parity_enable_
         , Min<uint8_t>{0}, Max<uint8_t>{exist.size() - 1}
+        , Out_callback    { [this]{ 
+            flash.uart_set.parity_enable = bool(parity_enable_);
+            change_screen(rs485_select);
+        }} // FIX its enter callback
+        , Enter_callback  {nullptr}
     };
 
     uint8_t parity_ {flash.uart_set.parity};
     Set_screen<uint8_t, parity_to_string> parity_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ 
-            flash.uart_set.parity = USART::Parity(parity_);
-            change_screen(rs485_select);
-        }}
         , "Проверка на"
         , parity_
         , Min<uint8_t>{0}, Max<uint8_t>{parity.size() - 1}
+        , Out_callback    { [this]{ 
+            flash.uart_set.parity = USART::Parity(parity_);
+            change_screen(rs485_select);
+        }} // FIX its enter callback
+        , Enter_callback  {nullptr}
     };
 
     int stop_bits {flash.uart_set.stop_bits == USART::StopBits::_1 ? 1 : 2};
     Set_screen<int> stop_bits_set {
           lcd, buttons_events
+        , "Количество стоп бит"
+        , stop_bits
+        , Min<int>{1}, Max<int>{2}
         , Out_callback    { [this]{ 
             flash.uart_set.stop_bits = 
                 stop_bits == 1 
@@ -187,18 +214,17 @@ struct Menu : TickSubscriber {
                 : USART::StopBits::_2
             ;
             change_screen(rs485_select);
-        }}
-        , "Количество стоп бит"
-        , stop_bits
-        , Min<int>{1}, Max<int>{2}
+        }} // FIX its enter callback
+        , Enter_callback  {nullptr}
     };
 
     Set_screen<int, model_to_string> name_set {
           lcd, buttons_events
-        , Out_callback    { [this]{ change_screen(tech_select);  }}
         , "Наименование уст."
         , flash.model_number
         , Min<int>{0}, Max<int>{models.size() - 1}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , Enter_callback  {nullptr}
     };
     
 
