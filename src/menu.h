@@ -68,9 +68,15 @@ struct Menu : TickSubscriber {
     Select_screen<3> alarm_select {
           lcd, buttons_events
         , Out_callback    { [this]{ change_screen(main_select);  }}
-        , Line {"Нерабочие лампы"    ,[]{}}
+        , Line {"Нерабочие лампы"    ,[this]{ change_screen(bad_lamps_screen);}}
         , Line {"Ошибки линии RS485" ,[]{}}
         , Line {"Сбросить аварии"    ,[]{}}
+    };
+
+    Bad_lamps_screen bad_lamps_screen {
+          lcd, Out_event{buttons_events.out}
+        , Out_callback       { [this]{ change_screen(alarm_select);  }}
+        , modbus.lamp, modbus.qty_uv_lamps
     };
 
     Select_screen<4> config_select {

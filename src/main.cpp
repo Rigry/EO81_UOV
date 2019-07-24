@@ -5,6 +5,7 @@
 #define HEAP_SIZE 1024
 
 #include "init_clock.h"
+#include "constant.h"
 #include "timers.h"
 #include "literals.h"
 #include "menu.h"
@@ -76,7 +77,7 @@ int main()
         uint16_t uv_level_min;           // 5
         uint16_t qty_uv_lamps;           // 6
         uint16_t uv_level_highest;       // 7
-        std::array<uint16_t, 112> hours;  // 8
+        std::array<uint16_t, glob::max_lamps> hours;  // 8
     }__attribute__((packed));
 
     struct Flags {
@@ -99,8 +100,8 @@ int main()
         uint16_t       uv_level_min;       // 8
         uint16_t       qty_uv_lamps;       // 9
         uint16_t       uv_level_highest;   // 10
-        Bit_set<112>   lamp;               // 11
-        std::array<uint16_t, 112> hours;   // 18
+        Bit_set<glob::max_lamps>   lamp;               // 11
+        std::array<uint16_t, glob::max_lamps> hours;   // 18
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
     // оптимизировал, неудобно отлаживать, потому volatile
@@ -218,6 +219,14 @@ int main()
         else if (work_flags.us_on)
             on_us(false);
     });
+
+    // for test
+    modbus_slave.outRegs.qty_uv_lamps = 50;
+    bool even {};
+    for (auto i{0}; i < modbus_slave.outRegs.qty_uv_lamps; i++) {
+        modbus_slave.outRegs.lamp[i] = even;
+        even ^= 1;
+    }
 
     while (1) {
         modbus_master();

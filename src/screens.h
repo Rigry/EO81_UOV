@@ -119,3 +119,46 @@ struct Main_screen : Screen {
         lcd.line(3).cursor(3).width(3) << temperatura;
     }
 };
+
+struct Bad_lamps_screen : Screen {
+    String_buffer& lcd;
+    Eventer out_event;
+    Callback<> out_callback;
+    const Bit_set<glob::max_lamps>& bad_lamps;
+    const uint16_t& qty_lamps;
+
+    Bad_lamps_screen (
+          String_buffer& lcd
+        , Out_event    out_event
+        , Out_callback out_callback
+        , Bit_set<glob::max_lamps>& bad_lamps
+        , uint16_t& qty_lamps
+    ) : lcd          {lcd}
+      , out_event    {out_event.value}
+      , out_callback {out_callback.value}
+      , bad_lamps    {bad_lamps}
+      , qty_lamps    {qty_lamps}
+    {}
+
+    void init() override {
+        out_event ([this]{ out_callback(); });
+    }
+    void deinit() override {
+        out_event (null_function);
+    }
+    void draw() override {
+        lcd.line(0);
+        uint16_t constexpr max_on_screen {20};
+        auto bad_qty {0};
+        for (auto i {0}; i < qty_lamps ; i++) {
+            if (bad_lamps[i]) {
+                lcd.width(4) << i;
+                bad_qty++;
+            }
+            if (bad_qty == max_on_screen) {
+                break;
+            }
+        }
+        lcd << clear_after;
+    }
+};
