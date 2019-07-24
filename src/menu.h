@@ -53,7 +53,7 @@ struct Menu : TickSubscriber {
         , flash.model_number
         , modbus.temperature
         , modbus.uv_level
-        , modbus.qty_uv_lamps
+        , modbus.quantity.lamps
     };
 
     Select_screen<4> main_select {
@@ -76,7 +76,7 @@ struct Menu : TickSubscriber {
     Bad_lamps_screen bad_lamps_screen {
           lcd, Out_event{buttons_events.out}
         , Out_callback       { [this]{ change_screen(alarm_select);  }}
-        , modbus.lamp, modbus.qty_uv_lamps
+        , modbus.lamp, modbus.quantity.lamps
     };
 
     Select_screen<3> work_select {
@@ -89,7 +89,7 @@ struct Menu : TickSubscriber {
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
         , Line {"Сброс одной лампы",[this]{ 
-            reset_n_set.max = modbus.qty_uv_lamps;
+            reset_n_set.max = modbus.quantity.lamps;
             change_screen(reset_n_set);
         }}
 
@@ -98,7 +98,7 @@ struct Menu : TickSubscriber {
     Work_time_screen work_time_screen {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(work_select);  }}
-        , modbus.hours, modbus.qty_uv_lamps
+        , modbus.hours, modbus.quantity.lamps
     };
 
     int reset_n {1};
@@ -118,10 +118,16 @@ struct Menu : TickSubscriber {
     Select_screen<4> config_select {
           lcd, buttons_events
         , Out_callback             { [this]{ change_screen(main_select);  }}
-        , Line {"Просмотр конф.-ии" ,[]{}}
+        , Line {"Просмотр конф.-ии" ,[this]{ change_screen(config_screen);}}
         , Line {"Тревога УФ"        ,[this]{ change_screen(min_UV_set);   }}
         , Line {"Настройка сети"    ,[this]{ change_screen(rs485_select); }}
         , Line {"Тех. настройки"    ,[this]{ change_screen(tech_select);  }}
+    };
+
+    Config_screen config_screen {
+          lcd, buttons_events
+        , Out_callback       { [this]{ change_screen(config_select);  }}
+        , modbus.quantity, flash.exist
     };
 
     Select_screen<5> rs485_select {

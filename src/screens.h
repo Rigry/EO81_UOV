@@ -79,7 +79,7 @@ struct Main_screen : Screen {
     int& model_n;
     uint16_t& temperatura;
     uint16_t& uv_level;
-    uint16_t& lamps_qty;
+    uint8_t&  lamps_qty;
 
     Main_screen(
           String_buffer& lcd
@@ -88,7 +88,7 @@ struct Main_screen : Screen {
         , int& model_n
         , uint16_t& temperatura
         , uint16_t& uv_level
-        , uint16_t& lamps_qty
+        , uint8_t&  lamps_qty
     ) : lcd          {lcd}
       , enter_event  {enter_event.value}
       , out_callback {out_callback.value}
@@ -125,14 +125,14 @@ struct Bad_lamps_screen : Screen {
     Eventer out_event;
     Callback<> out_callback;
     const Bit_set<glob::max_lamps>& bad_lamps;
-    const uint16_t& qty_lamps;
+    const uint8_t& qty_lamps;
 
     Bad_lamps_screen (
           String_buffer& lcd
         , Out_event    out_event
         , Out_callback out_callback
         , Bit_set<glob::max_lamps>& bad_lamps
-        , uint16_t& qty_lamps
+        , uint8_t& qty_lamps
     ) : lcd          {lcd}
       , out_event    {out_event.value}
       , out_callback {out_callback.value}
@@ -168,14 +168,14 @@ struct Work_time_screen : Screen {
     Buttons_events eventers;
     Callback<> out_callback;
     const std::array<uint16_t, glob::max_lamps>& hours;
-    const uint16_t& qty_lamps;
+    const uint8_t& qty_lamps;
 
     Work_time_screen (
           String_buffer& lcd
         , Buttons_events eventers
         , Out_callback out_callback
         , std::array<uint16_t, glob::max_lamps>& hours
-        , uint16_t& qty_lamps
+        , uint8_t& qty_lamps
     ) : lcd          {lcd}
       , eventers     {eventers}
       , out_callback {out_callback.value}
@@ -233,5 +233,83 @@ private:
         }
         lcd << clear_after;
     }
+};
 
+struct Config_screen : Screen {
+    String_buffer& lcd;
+    Buttons_events eventers;
+    Callback<> out_callback;
+    const Quantity& quantity;
+    const Exsist& exist;
+
+    Config_screen (
+          String_buffer& lcd
+        , Buttons_events eventers
+        , Out_callback out_callback
+        , Quantity&    quantity
+        , Exsist&      exist
+    ) : lcd           {lcd}
+      , eventers      {eventers}
+      , out_callback  {out_callback.value}
+      , quantity      {quantity}
+      , exist         {exist}
+    {}
+
+    void init() override {
+        eventers.up    ([this]{ up();    });
+        eventers.down  ([this]{ down();  });
+        eventers.out   ([this]{ out_callback(); });
+        redraw();
+    }
+    void deinit() override {
+        eventers.up    (null_function);
+        eventers.down  (null_function);
+        eventers.out   (null_function);
+    }
+
+    void draw() override {}
+
+    void redraw() {
+        lcd.line(0);
+        auto line_cnt {0};
+        if (from_line == 0) {
+            lcd << "Всего ламп: ";
+            lcd.width(3) << quantity.lamps << next_line;
+            line_cnt++;
+        }
+        if (from_line <= 1) {
+            lcd << "Плат расширения: ";
+            lcd.width(2) << quantity.extantions << next_line;
+            line_cnt++;
+        }
+        if (from_line <= 2) {
+            lcd << "Плата датчиков: " << (exist.board_sensor ? '+' : '-') << next_line;
+            line_cnt++;
+        }
+        if (from_line <= 3) {
+            lcd << "Датчик темп.: " << (exist.temp_sensor ? '+' : '-') << next_line;
+            line_cnt++;
+        }
+        if (line_cnt == 4)
+            return;
+        if (from_line <= 4) {
+            lcd << "Датчик УФ: " << (exist.uv_sensor ? '+' : '-') << next_line;
+            line_cnt++;
+        }
+        // TODO версия
+    }
+
+private:
+    int from_line {0};
+
+    void up(){
+        if (from_line > 0)
+            from_line--;
+        redraw();
+    }
+    void down(){
+        if (from_line < 1)
+            from_line++;
+        redraw();
+    }
 };

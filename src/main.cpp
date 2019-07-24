@@ -64,6 +64,11 @@ int main()
         uint16_t uv_level_highest      = 0x0100;
         int      model_number          = 0;
         uint16_t temperature_recovery  = 20;
+        Exsist exist = {
+            .board_sensor = false,
+            .temp_sensor  = false,
+            .uv_sensor    = false
+        };
     };
 
     Flash<Flash_data, mcu::FLASH::Sector::_127, mcu::FLASH::Sector::_126> flash{};
@@ -75,7 +80,7 @@ int main()
         uint16_t factory_number;         // 3
         uint16_t max_temperature;        // 4
         uint16_t uv_level_min;           // 5
-        uint16_t qty_uv_lamps;           // 6
+        uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
         uint16_t uv_level_highest;       // 7
         std::array<uint16_t, glob::max_lamps> hours;  // 8
     }__attribute__((packed));
@@ -98,10 +103,11 @@ int main()
         uint16_t       max_temperature;    // 6
         uint16_t       uv_level;           // 7
         uint16_t       uv_level_min;       // 8
-        uint16_t       qty_uv_lamps;       // 9
+        Quantity       quantity;           // 9
         uint16_t       uv_level_highest;   // 10
-        Bit_set<glob::max_lamps>   lamp;               // 11
-        std::array<uint16_t, glob::max_lamps> hours;   // 18
+
+        Bit_set<glob::max_lamps>   lamp;               // x
+        std::array<uint16_t, glob::max_lamps> hours;   // x+7
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
     // оптимизировал, неудобно отлаживать, потому volatile
@@ -221,17 +227,17 @@ int main()
     });
 
     // FIX delete, this for test bad lamps
-    modbus_slave.outRegs.qty_uv_lamps = 49;
+    modbus_slave.outRegs.quantity.lamps = 49;
     bool even {};
-    for (auto i{0}; i < modbus_slave.outRegs.qty_uv_lamps; i++) {
+    for (auto i{0}; i < modbus_slave.outRegs.quantity.lamps; i++) {
         modbus_slave.outRegs.lamp[i] = even;
         even ^= 1;
     }
 
     // FIX delete, this for test work time
-    modbus_slave.outRegs.qty_uv_lamps = 49;
+    modbus_slave.outRegs.quantity.lamps = 49;
     uint16_t hour {0};
-    for (auto i{0}; i < modbus_slave.outRegs.qty_uv_lamps; i++) {
+    for (auto i{0}; i < modbus_slave.outRegs.quantity.lamps; i++) {
         modbus_slave.outRegs.hours[i] = hour;
         hour -= 11111;
     }
