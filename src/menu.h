@@ -83,7 +83,11 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
-        , Line {"Сброс наработки"   ,[]{}}
+        , Line {"Сброс всех ламп   ",[this]{
+            for(auto& hour : modbus.hours)
+                hour = 0;
+            change_screen(work_time_screen); // чтоб увидеть действие
+        }}
     };
 
     Work_time_screen work_time_screen {
