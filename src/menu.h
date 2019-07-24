@@ -60,7 +60,7 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(main_screen);  }}
         , Line {"Аварии"      ,[this]{ change_screen(alarm_select); }}
-        , Line {"Наработка"   ,[]{}}
+        , Line {"Наработка"   ,[this]{ change_screen(work_select); }}
         , Line {"Конфигурация",[this]{ change_screen(config_select); }}
         , Line {"Лог работы"  ,[]{}}
     };
@@ -77,6 +77,19 @@ struct Menu : TickSubscriber {
           lcd, Out_event{buttons_events.out}
         , Out_callback       { [this]{ change_screen(alarm_select);  }}
         , modbus.lamp, modbus.qty_uv_lamps
+    };
+
+    Select_screen<2> work_select {
+          lcd, buttons_events
+        , Out_callback             { [this]{ change_screen(main_select);  }}
+        , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
+        , Line {"Сброс наработки"   ,[]{}}
+    };
+
+    Work_time_screen work_time_screen {
+          lcd, buttons_events
+        , Out_callback       { [this]{ change_screen(work_select);  }}
+        , modbus.hours, modbus.qty_uv_lamps
     };
 
     Select_screen<4> config_select {

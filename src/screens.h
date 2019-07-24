@@ -162,3 +162,71 @@ struct Bad_lamps_screen : Screen {
         lcd << clear_after;
     }
 };
+
+struct Work_time_screen : Screen {
+    String_buffer& lcd;
+    Buttons_events eventers;
+    Callback<> out_callback;
+    const std::array<uint16_t, glob::max_lamps>& hours;
+    const uint16_t& qty_lamps;
+
+    Work_time_screen (
+          String_buffer& lcd
+        , Buttons_events eventers
+        , Out_callback out_callback
+        , std::array<uint16_t, glob::max_lamps>& hours
+        , uint16_t& qty_lamps
+    ) : lcd          {lcd}
+      , eventers     {eventers}
+      , out_callback {out_callback.value}
+      , hours        {hours}
+      , qty_lamps    {qty_lamps}
+    {}
+
+    void init() override {
+        eventers.up    ([this]{ up();    });
+        eventers.down  ([this]{ down();  });
+        eventers.out   ([this]{ out_callback(); });
+        redraw();
+    }
+    void deinit() override {
+        eventers.up    (null_function);
+        eventers.down  (null_function);
+        eventers.out   (null_function);
+    }
+
+    void draw() override {}
+
+private:
+    int first_lamp {0};
+
+    void down() {
+        if (first_lamp + 8 >= qty_lamps)
+            return;
+        first_lamp += 2;
+        redraw();
+    }
+    
+    void up() {
+        if (first_lamp == 0) {
+            return;
+        }
+        first_lamp -= 2;
+        redraw();
+    }
+
+    void redraw() {
+        lcd.line(0);
+        uint16_t constexpr max_on_screen {8};
+        auto cnt {0};
+        for (auto i {first_lamp}; i < qty_lamps ; i++) {
+            lcd.width(3) << i+1 << ':';
+            lcd.width(5) << hours[i] << ' ';
+            if (++cnt == max_on_screen) {
+                break;
+            }
+        }
+        lcd << clear_after;
+    }
+
+};
