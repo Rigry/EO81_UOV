@@ -3,6 +3,8 @@ DEBUG = 1
 OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
+MCULIB_VERSION = v1.00
+GIT_VERSION := "$(shell git describe --abbrev=7 --always --tags)"
 
 ######################################
 # source
@@ -54,7 +56,8 @@ MCU_F1 = $(CPU_F1) -mthumb $(FPU_F1) $(FLOAT-ABI_F1)
 # compile gcc flags
 ASFLAGS_F1 = $(MCU_F1) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-CFLAGS_F1  = $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
+CFLAGS_F1  = -DMCULIB_VERSION=\"$(MCULIB_VERSION)\" -DVERSION=\"$(GIT_VERSION)\"
+CFLAGS_F1 += $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
 CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -fexec-charset=cp1251
 CFLAGS_F1 += -g -gdwarf-2 
 
@@ -72,7 +75,7 @@ LDFLAGS_F1  = $(MCU_F1) -specs=nano.specs -specs=nosys.specs
 LDFLAGS_F1 += -T$(LDSCRIPT_F1) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET_F1).map,--cref -Wl,--gc-sections
 
 # default action: build all
-all: clean \
+all: submodule clean \
 $(BUILD_DIR)/$(TARGET_F1).elf $(BUILD_DIR)/$(TARGET_F1).hex $(BUILD_DIR)/$(TARGET_F1).bin
 	
 
@@ -118,6 +121,11 @@ util:
 
 test_:
 	$(MAKE) -C ./test/
+
+submodule:
+	git submodule update --init
+	cd mculib3/ && git fetch
+	cd mculib3/ && git checkout $(MCULIB_VERSION)
   
 #######################################
 # dependencies

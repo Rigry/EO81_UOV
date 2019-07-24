@@ -1,5 +1,6 @@
 #pragma once
 
+
 // флаги наличия в системе
 struct Exsist {
     bool board_sensor :1;

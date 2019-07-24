@@ -296,7 +296,19 @@ struct Config_screen : Screen {
             lcd << "Датчик УФ: " << (exist.uv_sensor ? '+' : '-') << next_line;
             line_cnt++;
         }
-        // TODO версия
+        if (line_cnt == 4)
+            return;
+        if (from_line <= 5) {
+            lcd << "Версия: " << VERSION << next_line;
+            line_cnt++;
+        }
+        if (line_cnt == 4)
+            return;
+        if (from_line <= 5) {
+            lcd << "Версия библ.: " << MCULIB_VERSION << next_line;
+            line_cnt++;
+        }
+
     }
 
 private:
@@ -308,7 +320,7 @@ private:
         redraw();
     }
     void down(){
-        if (from_line < 1)
+        if (from_line < 3)
             from_line++;
         redraw();
     }
