@@ -339,3 +339,78 @@ private:
     }
 };
 
+using Password_callback = Construct_wrapper<Callback<int>>;
+
+struct Password_screen : Screen {
+    String_buffer& lcd;
+    Buttons_events eventers;
+    Callback<>     out_callback;
+    Callback<int>  password_callback;
+
+    Password_screen (
+          String_buffer&    lcd
+        , Buttons_events    eventers
+        , Out_callback      out_callback
+        , Password_callback password_callback
+    ) : lcd               {lcd}
+      , eventers          {eventers}
+      , out_callback      {out_callback.value}
+      , password_callback {password_callback.value}
+    {}
+
+    void init() override {
+        eventers.up    ([this]{ up();    });
+        eventers.down  ([this]{ down();  });
+        eventers.out   ([this]{ out_callback(); });
+        eventers.enter ([this]{ enter();  });
+        lcd.line(0).center() << "Введите пароль" << clear_after;
+        std::fill(std::begin(digits), std::end(digits), 0);
+        index = 3;
+        redraw();
+    }
+    void deinit() override {
+        eventers.up    (null_function);
+        eventers.down  (null_function);
+        eventers.out   (null_function);
+        eventers.enter (null_function);
+    }
+
+    void draw() override {}
+
+
+private:
+    std::array<int,4> digits {0};
+    int index {3};
+
+    void down() {
+        digits[index]--;
+        if (digits[index] < 0) {
+            digits[index] = 9;
+        }
+        redraw();
+    }
+    
+    void up() {
+        digits[index]++;
+        digits[index] %= 10;
+        redraw();
+    }
+
+    void enter() {
+        if (--index < 0) {
+            int password {0};
+            for (auto n : digits)
+                (password *= 10) += n;
+            password_callback(password);
+            return;
+        }
+        redraw();
+    }
+
+    void redraw() {
+        lcd.line(2).cursor(8);
+        for (auto n : digits)
+            lcd << n;
+        lcd.line(3).cursor(8+index) << char(0x5E) << next_line;
+    }
+};

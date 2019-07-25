@@ -117,15 +117,15 @@ struct Menu : TickSubscriber {
 
     Select_screen<8> config_select {
           lcd, buttons_events
-        , Out_callback             { [this]{ change_screen(main_select);  }}
-        , Line {"Просмотр конф.-ии" ,[this]{ change_screen(config_screen);}}
-        , Line {"Тревога УФ"        ,[this]{ change_screen(min_UV_set);   }}
-        , Line {"Адрес"             ,[this]{ change_screen(address_set);  }}
-        , Line {"Скорость"          ,[this]{ change_screen(boudrate_set); }}
-        , Line {"Проверка"          ,[this]{ change_screen(parity_en_set);}}
-        , Line {"Тип проверки"      ,[this]{ change_screen(parity_set);   }}
-        , Line {"Стоп биты"         ,[this]{ change_screen(stop_bits_set);}}
-        , Line {"Тех. настройки"    ,[this]{ change_screen(tech_select);  }}
+        , Out_callback             { [this]{ change_screen(main_select);     }}
+        , Line {"Просмотр конф.-ии" ,[this]{ change_screen(config_screen);   }}
+        , Line {"Тревога УФ"        ,[this]{ change_screen(min_UV_set);      }}
+        , Line {"Адрес"             ,[this]{ change_screen(address_set);     }}
+        , Line {"Скорость"          ,[this]{ change_screen(boudrate_set);    }}
+        , Line {"Проверка"          ,[this]{ change_screen(parity_en_set);   }}
+        , Line {"Тип проверки"      ,[this]{ change_screen(parity_set);      }}
+        , Line {"Стоп биты"         ,[this]{ change_screen(stop_bits_set);   }}
+        , Line {"Тех. настройки"    ,[this]{ change_screen(password_screen); }}
     };
 
     Config_screen config_screen {
@@ -225,8 +225,18 @@ struct Menu : TickSubscriber {
         , "Наименование уст."
         , flash.model_number
         , Min<int>{0}, Max<int>{models.size() - 1}
-        , Out_callback    { [this]{ change_screen(tech_select);  }}
-        , Enter_callback  {nullptr}
+        , Out_callback    { [this]{ change_screen(config_select);  }}
+    };
+
+    Password_screen password_screen {
+          lcd, buttons_events
+        , Out_callback      { [this]{ change_screen(config_select); }}
+        , Password_callback { [this](int password){ 
+            if (password == 208)
+                change_screen(name_set);
+            else
+                change_screen(config_select);
+        }}
     };
     
 
