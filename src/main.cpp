@@ -236,6 +236,7 @@ int main()
 
     // FIX delete, this for test work time
     modbus_slave.outRegs.quantity.lamps = 49;
+    modbus_slave.outRegs.quantity.extantions = 4;
     uint16_t hour {0};
     for (auto i{0}; i < modbus_slave.outRegs.quantity.lamps; i++) {
         modbus_slave.outRegs.hours[i] = hour;

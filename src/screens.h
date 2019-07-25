@@ -269,6 +269,11 @@ struct Config_screen : Screen {
 
     void draw() override {}
 
+
+
+private:
+    int from_line {0};
+
     void redraw() {
         lcd.line(0);
         auto line_cnt {0};
@@ -299,20 +304,28 @@ struct Config_screen : Screen {
         if (line_cnt == 4)
             return;
         if (from_line <= 5) {
-            lcd << "Версия: " << VERSION << next_line;
+            lcd << "Vers.:" << format(VERSION) << next_line;
             line_cnt++;
         }
         if (line_cnt == 4)
             return;
         if (from_line <= 5) {
-            lcd << "Версия библ.: " << MCULIB_VERSION << next_line;
+            lcd << "Libr.:" << format(MCULIB_VERSION) << next_line;
             line_cnt++;
         }
-
     }
 
-private:
-    int from_line {0};
+    // TODO вырезать количество коммитов (проблема с constexpr)
+    // вот неверная попытка https://wandbox.org/permlink/v5cRmBtse0h7ksxr
+    // возвращение временного массива
+    // возможное решение 
+    // https://github.com/boostcon/cppnow_presentations_2012/blob/master/wed/schurr_cpp11_tools_for_class_authors.pdf?raw=true
+    constexpr std::string_view format(std::string_view in) {
+        auto begin = in[0] == 'v' ? 1 : 0;
+        size_t max_length = 12;
+        auto end = std::min(max_length, in.length()) + begin;
+        return in.substr(begin, end);
+    }
 
     void up(){
         if (from_line > 0)
@@ -325,3 +338,4 @@ private:
         redraw();
     }
 };
+
