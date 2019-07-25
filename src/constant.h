@@ -15,5 +15,8 @@ struct Quantity {
 };
 
 namespace glob {
-    auto constexpr max_lamps {112};
+    auto constexpr max_lamps       {112};
+    auto constexpr max_extantions  {max_lamps/16};
+    auto constexpr password        {208};
+    auto constexpr max_temperature {99};
 }

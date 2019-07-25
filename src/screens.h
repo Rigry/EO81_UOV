@@ -46,9 +46,18 @@ constexpr std::string_view exist_to_string(int i) {
     return exist[i];
 }
 
+constexpr auto confirm = std::array {
+    "нет",
+    "да"
+};
+
+constexpr std::string_view confirm_to_string(int i) {
+    return confirm[i];
+}
+
 constexpr auto boudrate = std::array {
     "9600",
-    "14400"
+    "14400",
     "19200",
     "28800",
     "38400",
@@ -76,7 +85,7 @@ struct Main_screen : Screen {
     String_buffer& lcd;
     Eventer enter_event;
     Callback<> out_callback;
-    int& model_n;
+    uint8_t&  model_n;
     uint16_t& temperatura;
     uint16_t& uv_level;
     uint8_t&  lamps_qty;
@@ -85,7 +94,7 @@ struct Main_screen : Screen {
           String_buffer& lcd
         , Enter_event enter_event
         , Out_callback out_callback
-        , int& model_n
+        , uint8_t& model_n
         , uint16_t& temperatura
         , uint16_t& uv_level
         , uint8_t&  lamps_qty

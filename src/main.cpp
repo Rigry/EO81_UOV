@@ -58,12 +58,15 @@ int main()
             .res            = 0
         };
         uint8_t  modbus_address        = 1;
-        uint16_t max_temperature       = 55;
-        int      uv_level_min          = 40;  
-        uint16_t qty_uv_lamps          = 5;
+        uint8_t  max_temperature       = 55;
+        uint8_t  uv_level_min          = 40;
+        Quantity quantity = {
+            .lamps = 5,
+            .extantions = 0
+        };
         uint16_t uv_level_highest      = 0x0100;
-        int      model_number          = 0;
-        uint16_t temperature_recovery  = 20;
+        uint8_t  model_number          = 0;
+        uint8_t  temperature_recovery  = 20;
         Exsist exist = {
             .board_sensor = false,
             .temp_sensor  = false,
@@ -199,7 +202,7 @@ int main()
     auto  uv_button = Button<UV_BTN>();
 
     auto on_uv = [&](bool on = true){
-        uv = uv_led = work_flags.us_on = on;
+        uv = uv_led = work_flags.uv_on = on;
     };
 
     uv_button.set_down_callback([&]{

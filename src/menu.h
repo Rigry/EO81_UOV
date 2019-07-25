@@ -134,13 +134,12 @@ struct Menu : TickSubscriber {
         , modbus.quantity, flash.exist
     };
 
-    Set_screen<int> min_UV_set {
+    Set_screen<uint8_t> min_UV_set {
           lcd, buttons_events
         , "уровень УФ"
         , flash.uv_level_min
-        , Min<int>{1}, Max<int>{100}
+        , Min<uint8_t>{1}, Max<uint8_t>{100}
         , Out_callback    { [this]{ change_screen(config_select);  }}
-        , Enter_callback  {nullptr}
     };
 
     Set_screen<uint8_t> address_set {
@@ -149,7 +148,6 @@ struct Menu : TickSubscriber {
         , flash.modbus_address
         , Min<uint8_t>{1}, Max<uint8_t>{255}
         , Out_callback    { [this]{ change_screen(config_select);  }}
-        , Enter_callback  {nullptr}
     };
 
     // приходится сохранять, так как нельзя сделать ссылку на член битового поля
@@ -209,35 +207,145 @@ struct Menu : TickSubscriber {
         }}
     };
 
-
-    Select_screen<4> tech_select {
-          lcd, buttons_events
-        , Out_callback        { [this]{ change_screen(config_select);  }}
-        , Line {"Наименование" ,[this]{ change_screen(name_set);   }}
-        , Line {"туду"   ,[]{}}
-        , Line {"туду"   ,[]{}}
-        , Line {"туду"   ,[]{}}
-    };
-
-
-    Set_screen<int, model_to_string> name_set {
-          lcd, buttons_events
-        , "Наименование уст."
-        , flash.model_number
-        , Min<int>{0}, Max<int>{models.size() - 1}
-        , Out_callback    { [this]{ change_screen(config_select);  }}
-    };
-
     Password_screen password_screen {
           lcd, buttons_events
         , Out_callback      { [this]{ change_screen(config_select); }}
         , Password_callback { [this](int password){ 
-            if (password == 208)
-                change_screen(name_set);
+            if (password == glob::password)
+                change_screen(tech_select);
             else
                 change_screen(config_select);
         }}
     };
+
+    int confirm;
+    Select_screen<10> tech_select {
+          lcd, buttons_events
+        , Out_callback        { [this]{ change_screen(config_select);           }}
+        , Line {"Наименование"       ,[this]{ change_screen(name_set);          }}
+        , Line {"Сброс максимума УФ" ,[this]{ change_screen(max_uv_set);        }}
+        , Line {"Кол-во ламп тут"    ,[this]{ change_screen(qty_lamps_set);     }}
+        , Line {"Кол-во расширений"  ,[this]{ change_screen(qty_extentions_set);}}
+        , Line {"Макс. температура"  ,[this]{ change_screen(max_temp_set);      }}
+        , Line {"Темп. восстановл."  ,[this]{ change_screen(recovery_temp_set); }}
+        , Line {"Сброс лога"         ,[this]{
+            confirm = 0;
+            change_screen(log_reset);
+        }}
+        , Line {"Плата датчиков"     ,[this]{ change_screen(sens_board_set); }}
+        , Line {"Датчик температуры" ,[this]{ change_screen(sens_temp_set);  }}
+        , Line {"Датчик УФ"          ,[this]{ change_screen(sens_uv_set);    }}
+    };
+
+    Set_screen<uint8_t, model_to_string> name_set {
+          lcd, buttons_events
+        , "Наименование уст."
+        , flash.model_number
+        , Min<uint8_t>{0}, Max<uint8_t>{models.size() - 1}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint16_t> max_uv_set {
+          lcd, buttons_events
+        , "Максимум УФ"
+        , flash.uv_level_highest
+        , Min<uint16_t>{0}, Max<uint16_t>{0xFFFF}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint8_t> qty_lamps_set {
+          lcd, buttons_events
+        , "Кол-во ламп тут"
+        , flash.quantity.lamps
+        , Min<uint8_t>{1}, Max<uint8_t>{glob::max_lamps}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint8_t> qty_extentions_set {
+          lcd, buttons_events
+        , "Кол-во расширений"
+        , flash.quantity.extantions
+        , Min<uint8_t>{0}, Max<uint8_t>{glob::max_extantions}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint8_t> max_temp_set {
+          lcd, buttons_events
+        , "Макс. температура"
+        , flash.max_temperature
+        , Min<uint8_t>{20}, Max<uint8_t>{glob::max_temperature}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint8_t> recovery_temp_set {
+          lcd, buttons_events
+        , "Темп. восстановл."
+        , flash.temperature_recovery
+        , Min<uint8_t>{20}, Max<uint8_t>{glob::max_temperature}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<uint8_t> low_uv_set {
+          lcd, buttons_events
+        , "Уровень низк. УФ"
+        , flash.uv_level_min
+        , Min<uint8_t>{1}, Max<uint8_t>{100}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<int, confirm_to_string> log_reset {
+          lcd, buttons_events
+        , "Сбросить лог?"
+        , confirm
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , Enter_callback  { [this]{
+            if (confirm) {
+                // TODO reset log
+            }
+            change_screen(tech_select);
+        }}
+    };
+
+    int board_sensor {flash.exist.board_sensor};
+    Set_screen<int, exist_to_string> sens_board_set {
+          lcd, buttons_events
+        , "Плата датчиков"
+        , board_sensor
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select); }}
+        , Enter_callback  { [this]{ 
+            flash.exist.board_sensor = bool(board_sensor);
+            change_screen(tech_select);
+        }}
+    };
+
+    int temp_sensor {flash.exist.temp_sensor};
+    Set_screen<int, exist_to_string> sens_temp_set {
+          lcd, buttons_events
+        , "Датчик температуры"
+        , temp_sensor
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select); }}
+        , Enter_callback  { [this]{ 
+            flash.exist.temp_sensor = bool(temp_sensor);
+            change_screen(tech_select);
+        }}
+    };
+
+    int uv_sensor {flash.exist.uv_sensor};
+    Set_screen<int, exist_to_string> sens_uv_set {
+          lcd, buttons_events
+        , "Датчик УФ"
+        , uv_sensor
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select); }}
+        , Enter_callback  { [this]{ 
+            flash.exist.uv_sensor = bool(uv_sensor);
+            change_screen(tech_select);
+        }}
+    };
+
     
 
     void notify() override {
