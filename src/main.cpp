@@ -99,7 +99,9 @@ int main()
         bool uv_on        : 1;
         bool uv_low_level : 1;
         bool overheat     : 1;
-        uint16_t          :12;
+        bool us_started   : 1;
+        bool uv_started   : 1;
+        uint16_t          :10;
     };
 
     struct Out_regs {
@@ -208,15 +210,16 @@ int main()
     auto  uv_button = Button<UV_BTN>();
 
     auto on_uv = [&](bool on = true){
+        flash.count.on += int(on and not uv);
         uv = uv_led = work_flags.uv_on = on;
-        flash.count.on += int(on);
     };
 
     uv_button.set_down_callback([&]{
-        if (not work_flags.uv_on and not overheat)
-            on_uv();
-        else if (work_flags.uv_on)
-            on_uv(false);
+        if (overheat) {
+            work_flags.uv_started = false;
+            return;
+        }
+        work_flags.uv_started ^= 1;
     });
 
     // US control
@@ -230,10 +233,11 @@ int main()
     };
 
     us_button.set_down_callback([&]{
-        if (not work_flags.us_on and not overheat)
-            on_us();
-        else if (work_flags.us_on)
-            on_us(false);
+        if (overheat) {
+            work_flags.us_started = false;
+            return;
+        }
+        work_flags.us_started ^= 1;
     });
 
     // FIX delete, this for test bad lamps
@@ -265,10 +269,9 @@ int main()
         uv_level_percent = uv_level * 100 / flash.uv_level_highest;
         work_flags.uv_low_level = uv_level_percent < flash.uv_level_min;
         
-        if (work_flags.overheat) {
-            on_us(false);
-            on_uv(false);
-        }
+        on_us (work_flags.us_started and not overheat);
+        on_uv (work_flags.uv_started and not overheat);
+
         // TODO add other alarms уточнить у Олега
         alarm_led = work_flags.overheat or work_flags.uv_low_level;
 
