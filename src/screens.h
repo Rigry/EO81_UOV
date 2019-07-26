@@ -134,20 +134,23 @@ struct Bad_lamps_screen : Screen {
     String_buffer& lcd;
     Eventer out_event;
     Callback<> out_callback;
-    const std::bitset<glob::max_lamps>& bad_lamps;
+    const std::array<uint16_t, glob::max_extantions+1>& lamps;
     const uint8_t& qty_lamps;
+    const Flags& flags;
 
     Bad_lamps_screen (
           String_buffer& lcd
         , Out_event    out_event
         , Out_callback out_callback
-        , std::bitset<glob::max_lamps>& bad_lamps
+        , std::array<uint16_t, glob::max_extantions+1>& lamps
         , uint8_t& qty_lamps
+        , Flags& flags
     ) : lcd          {lcd}
       , out_event    {out_event.value}
       , out_callback {out_callback.value}
-      , bad_lamps    {bad_lamps}
+      , lamps        {lamps}
       , qty_lamps    {qty_lamps}
+      , flags        {flags}
     {}
 
     void init() override {
@@ -158,10 +161,27 @@ struct Bad_lamps_screen : Screen {
     }
     void draw() override {
         lcd.line(0);
+
+        if (not flags.uv_on) {
+            lcd.center() << "Не включено";
+            lcd << clear_after;
+            return;
+        }
+
+        // TODO добавить логику для плат расширений
+        bool all {true};
+        for (auto i{0}; i < qty_lamps; i++)
+            all &= (lamps[0] >> i) & 0b1;
+        if (all) {
+            lcd.center() << "Отсуствуют";
+            lcd << clear_after;
+            return;
+        }
+
         uint16_t constexpr max_on_screen {20};
         auto bad_qty {0};
         for (auto i {0}; i < qty_lamps ; i++) {
-            if (bad_lamps[i]) {
+            if (not ((lamps[0] >> i) & 0b1)) {
                 lcd.width(4) << i;
                 bad_qty++;
             }

@@ -28,7 +28,7 @@ auto from_tuple(T in) {
 class Lamps : TickSubscriber {
 public:
     template<class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
-    static Lamps& make(std::bitset<glob::max_lamps>& lamps, uint8_t& lamps_qty)
+    static Lamps& make(uint16_t& lamps, uint8_t& lamps_qty)
     {
         auto pins = make_pins<
             mcu::PinMode::Input,
@@ -44,13 +44,13 @@ public:
 
 
 private:
-    std::array<Pin*, 10> pins;
-    std::bitset<glob::max_lamps>& lamps;
+    const std::array<Pin*, 10> pins;
+    uint16_t& lamps;
     const uint8_t& lamps_qty;
 
     Lamps(
           std::array<Pin*, 10> pins
-        , std::bitset<glob::max_lamps>& lamps
+        , uint16_t& lamps
         , uint8_t& lamps_qty
     ) : pins {pins}, lamps {lamps}, lamps_qty{lamps_qty}
     {
@@ -59,9 +59,10 @@ private:
 
     void notify() override {
         // заполняем только первые 10
-        // с конца в бит сете, чтобы первые 16 были в первом регистре
+        uint16_t tmp{0};
         for (auto i{0}; i < lamps_qty; i++) {
-            lamps[lamps.size() - i] = *pins[i];
+            tmp |= *pins[i] << i;
         }
+        lamps = tmp;
     }
 };

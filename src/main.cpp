@@ -106,16 +106,6 @@ int main()
         std::array<uint16_t, glob::max_lamps> hours;  // 8
     }__attribute__((packed));
 
-    struct Flags {
-        bool us_on        : 1;
-        bool uv_on        : 1;
-        bool uv_low_level : 1;
-        bool overheat     : 1;
-        bool us_started   : 1;
-        bool uv_started   : 1;
-        uint16_t          :10;
-    };
-
     struct Out_regs {
         uint16_t       device_code;        // 0
         uint16_t       factory_number;     // 1
@@ -128,9 +118,8 @@ int main()
         uint16_t       uv_level_min;       // 8
         Quantity       quantity;           // 9
         uint16_t       uv_level_highest;   // 10
-
-        std::bitset<glob::max_lamps>   lamp;               // x
-        std::array<uint16_t, glob::max_lamps> hours;   // x+7
+        std::array<uint16_t, glob::max_extantions+1> lamp; // 11
+        std::array<uint16_t, glob::max_lamps> hours;       // 22
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
     // оптимизировал, неудобно отлаживать, потому volatile
@@ -256,24 +245,7 @@ int main()
     // Определение плохих ламп
     Lamps::make<
         EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
-    >(modbus_slave.outRegs.lamp, flash.quantity.lamps);
-
-    // FIX delete, this for test bad lamps
-    modbus_slave.outRegs.quantity.lamps = 49;
-    bool even {};
-    for (auto i{0}; i < modbus_slave.outRegs.quantity.lamps; i++) {
-        modbus_slave.outRegs.lamp[i] = even;
-        even ^= 1;
-    }
-
-    // FIX delete, this for test work time
-    modbus_slave.outRegs.quantity.lamps = 49;
-    modbus_slave.outRegs.quantity.extantions = 4;
-    uint16_t hour {0};
-    for (auto i{0}; i < modbus_slave.outRegs.quantity.lamps; i++) {
-        modbus_slave.outRegs.hours[i] = hour;
-        hour -= 11111;
-    }
+    >(modbus_slave.outRegs.lamp[0], flash.quantity.lamps);
 
     while (1) {
         modbus_master();
