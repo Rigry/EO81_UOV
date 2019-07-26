@@ -423,3 +423,38 @@ private:
         lcd.line(3).cursor(8+index) << char(0x5E) << next_line;
     }
 };
+
+struct Log_screen : Screen {
+    String_buffer& lcd;
+    Eventer out_event;
+    Callback<> out_callback;
+    const Count& count;
+
+    Log_screen (
+          String_buffer& lcd
+        , Out_event      out_event
+        , Out_callback   out_callback
+        , Count&         count
+    ) : lcd          {lcd}
+      , out_event    {out_event.value}
+      , out_callback {out_callback.value}
+      , count        {count}
+    {}
+
+    void init() override {
+        out_event ([this]{ out_callback(); });
+        lcd.line(0);
+        lcd << "Включений:     ";
+        lcd.width(5) << count.on;
+        lcd << "Сбросов полных:";
+        lcd.width(5) << count.reset_all;
+        lcd << "Сбросов один.: ";
+        lcd.width(5) << count.reset_one;
+        lcd << "Сбросов логов: ";
+        lcd.width(5) << count.reset_log;
+    }
+    void deinit() override {
+        out_event (null_function);
+    }
+    void draw() override {}
+};

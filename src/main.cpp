@@ -72,6 +72,12 @@ int main()
             .temp_sensor  = false,
             .uv_sensor    = false
         };
+        Count count = {
+            .on        = 0,
+            .reset_all = 0,
+            .reset_one = 0,
+            .reset_log = 0
+        };
     };
 
     Flash<Flash_data, mcu::FLASH::Sector::_127, mcu::FLASH::Sector::_126> flash{};
@@ -203,6 +209,7 @@ int main()
 
     auto on_uv = [&](bool on = true){
         uv = uv_led = work_flags.uv_on = on;
+        flash.count.on += int(on);
     };
 
     uv_button.set_down_callback([&]{

@@ -60,9 +60,9 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(main_screen);  }}
         , Line {"Аварии"      ,[this]{ change_screen(alarm_select); }}
-        , Line {"Наработка"   ,[this]{ change_screen(work_select); }}
-        , Line {"Конфигурация",[this]{ change_screen(config_select); }}
-        , Line {"Лог работы"  ,[]{}}
+        , Line {"Наработка"   ,[this]{ change_screen(work_select);  }}
+        , Line {"Конфигурация",[this]{ change_screen(config_select);}}
+        , Line {"Лог работы"  ,[this]{ change_screen(log_screen);   }}
     };
 
     Select_screen<3> alarm_select {
@@ -84,8 +84,9 @@ struct Menu : TickSubscriber {
         , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс всех ламп   ",[this]{
-            for(auto& hour : modbus.hours) // TODO ещё во flash
-                hour = 0;
+            std::fill(std::begin(modbus.hours), std::end(modbus.hours), 0);
+            // TODO ещё во flash
+            flash.count.reset_all++;
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
         , Line {"Сброс одной лампы",[this]{ 
@@ -110,6 +111,7 @@ struct Menu : TickSubscriber {
         , Out_callback      { [this]{ change_screen(work_select);  }}
         , Enter_callback    { [this]{
             modbus.hours[reset_n-1] = 0; // TODO во флэше тоже
+            flash.count.reset_one++;
             work_time_screen.set_first_lamp(reset_n-1);
             change_screen(work_time_screen);
         }}
@@ -301,7 +303,10 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , Enter_callback  { [this]{
             if (confirm) {
-                // TODO reset log
+                flash.count.on        = 0;
+                flash.count.reset_all = 0;
+                flash.count.reset_one = 0;
+                flash.count.reset_log++;
             }
             change_screen(tech_select);
         }}
@@ -344,6 +349,12 @@ struct Menu : TickSubscriber {
             flash.exist.uv_sensor = bool(uv_sensor);
             change_screen(tech_select);
         }}
+    };
+
+    Log_screen log_screen {
+          lcd, Out_event{buttons_events.out}
+        , Out_callback       { [this]{ change_screen(main_select); }}
+        , flash.count
     };
 
     
