@@ -76,7 +76,7 @@ struct Menu : TickSubscriber {
     Bad_lamps_screen bad_lamps_screen {
           lcd, Out_event{buttons_events.out}
         , Out_callback       { [this]{ change_screen(alarm_select);  }}
-        , modbus.lamp, modbus.quantity.lamps, modbus.work_flags
+        , modbus.bad_lamps, modbus.quantity.lamps, modbus.work_flags
     };
 
     Select_screen<3> work_select {
@@ -261,6 +261,10 @@ struct Menu : TickSubscriber {
         , flash.quantity.lamps
         , Min<uint8_t>{1}, Max<uint8_t>{glob::max_lamps}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , Enter_callback  { [this]{
+            modbus.quantity = flash.quantity;
+            change_screen(tech_select);
+        }}
     };
 
     Set_screen<uint8_t> qty_extentions_set {
@@ -269,6 +273,10 @@ struct Menu : TickSubscriber {
         , flash.quantity.extantions
         , Min<uint8_t>{0}, Max<uint8_t>{glob::max_extantions}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , Enter_callback  { [this]{
+            modbus.quantity = flash.quantity;
+            change_screen(tech_select);
+        }}
     };
 
     Set_screen<uint8_t> max_temp_set {

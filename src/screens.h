@@ -134,7 +134,7 @@ struct Bad_lamps_screen : Screen {
     String_buffer& lcd;
     Eventer out_event;
     Callback<> out_callback;
-    const std::array<uint16_t, glob::max_extantions+1>& lamps;
+    const std::array<uint16_t, glob::max_extantions+1>& bad_lamps;
     const uint8_t& qty_lamps;
     const Flags& flags;
 
@@ -142,13 +142,13 @@ struct Bad_lamps_screen : Screen {
           String_buffer& lcd
         , Out_event    out_event
         , Out_callback out_callback
-        , std::array<uint16_t, glob::max_extantions+1>& lamps
+        , std::array<uint16_t, glob::max_extantions+1>& bad_lamps
         , uint8_t& qty_lamps
         , Flags& flags
     ) : lcd          {lcd}
       , out_event    {out_event.value}
       , out_callback {out_callback.value}
-      , lamps        {lamps}
+      , bad_lamps    {bad_lamps}
       , qty_lamps    {qty_lamps}
       , flags        {flags}
     {}
@@ -169,10 +169,7 @@ struct Bad_lamps_screen : Screen {
         }
 
         // TODO добавить логику для плат расширений
-        bool all {true};
-        for (auto i{0}; i < qty_lamps; i++)
-            all &= (lamps[0] >> i) & 0b1;
-        if (all) {
+        if (bad_lamps[0] == 0) {
             lcd.center() << "Отсуствуют";
             lcd << clear_after;
             return;
@@ -181,7 +178,7 @@ struct Bad_lamps_screen : Screen {
         uint16_t constexpr max_on_screen {20};
         auto bad_qty {0};
         for (auto i {0}; i < qty_lamps ; i++) {
-            if (not ((lamps[0] >> i) & 0b1)) {
+            if ((bad_lamps[0] >> i) & 0b1) {
                 lcd.width(4) << i;
                 bad_qty++;
             }

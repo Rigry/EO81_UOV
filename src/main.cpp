@@ -118,7 +118,7 @@ int main()
         uint16_t       uv_level_min;       // 8
         Quantity       quantity;           // 9
         uint16_t       uv_level_highest;   // 10
-        std::array<uint16_t, glob::max_extantions+1> lamp; // 11
+        std::array<uint16_t, glob::max_extantions+1> bad_lamps; // 11
         std::array<uint16_t, glob::max_lamps> hours;       // 22
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
@@ -135,6 +135,7 @@ int main()
     modbus_slave.outRegs.factory_number    = flash.factory_number;
     modbus_slave.outRegs.uart_set          = flash.uart_set;
     modbus_slave.outRegs.modbus_address    = flash.modbus_address;
+    modbus_slave.outRegs.quantity          = flash.quantity;
     modbus_slave.arInRegsMax[ADR(uart_set)]= 0b11111111;
     modbus_slave.inRegsMin.modbus_address  = 1;
     modbus_slave.inRegsMax.modbus_address  = 255;
@@ -245,7 +246,8 @@ int main()
     // Определение плохих ламп
     Lamps::make<
         EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
-    >(modbus_slave.outRegs.lamp[0], flash.quantity.lamps);
+    >(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
+
 
     while (1) {
         modbus_master();
