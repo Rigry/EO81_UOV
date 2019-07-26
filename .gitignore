@@ -1,2 +1,4 @@
-build/*
+build
 .vscode/ipch
+build/EO81v2.bin
+build/EO81v2.hex

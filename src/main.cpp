@@ -15,6 +15,7 @@
 #include "hysteresis.h"
 #include "utils.h"
 #include "flash.h"
+#include "lamps.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -42,6 +43,17 @@ using US_CTRL = mcu::PB11;
 using LED1 = mcu::PB12;
 using LED2 = mcu::PC6;
 using LED3 = mcu::PC7;
+
+using EPRA1  = mcu::PA0;
+using EPRA2  = mcu::PA1;
+using EPRA3  = mcu::PA2;
+using EPRA4  = mcu::PA3;
+using EPRA5  = mcu::PA4;
+using EPRA6  = mcu::PA5;
+using EPRA7  = mcu::PA6;
+using EPRA8  = mcu::PA7;
+using EPRA9  = mcu::PC4;
+using EPRA10 = mcu::PC5;
 
 
 
@@ -117,7 +129,7 @@ int main()
         Quantity       quantity;           // 9
         uint16_t       uv_level_highest;   // 10
 
-        Bit_set<glob::max_lamps>   lamp;               // x
+        std::bitset<glob::max_lamps>   lamp;               // x
         std::array<uint16_t, glob::max_lamps> hours;   // x+7
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
@@ -137,41 +149,42 @@ int main()
     modbus_slave.arInRegsMax[ADR(uart_set)]= 0b11111111;
     modbus_slave.inRegsMin.modbus_address  = 1;
     modbus_slave.inRegsMax.modbus_address  = 255;
-    modbus_slave.inRegsMin.qty_uv_lamps    = 0;
+    modbus_slave.inRegsMin.qty_uv_lamps    = 1;
     modbus_slave.inRegsMax.qty_uv_lamps    = 10;
 
     struct {
-        Register<1,  Modbus_function::read_03, 0> qty_lamps_1;
-        Register<2,  Modbus_function::read_03, 0> qty_lamps_2;
-        Register<3,  Modbus_function::read_03, 0> qty_lamps_3;
-        Register<4,  Modbus_function::read_03, 0> qty_lamps_4;
-        Register<5,  Modbus_function::read_03, 0> qty_lamps_5;
-        Register<6,  Modbus_function::read_03, 0> qty_lamps_6;
-        Register<7,  Modbus_function::read_03, 0> qty_lamps_7;
-        Register<8,  Modbus_function::read_03, 0> qty_lamps_8;
-        Register<9,  Modbus_function::read_03, 0> qty_lamps_9;
-        Register<10, Modbus_function::read_03, 0> qty_lamps_10;
-        Register<11, Modbus_function::read_03, 0> qty_lamps_11;
-        Register<12, Modbus_function::read_03, 0> qty_lamps_12;
-        Register<13, Modbus_function::read_03, 0> qty_lamps_13;
-        Register<14, Modbus_function::read_03, 0> qty_lamps_14;
-        Register<15, Modbus_function::read_03, 0> qty_lamps_15;
+        // TODO пока без модулей расширения
+        // Register<1,  Modbus_function::read_03, 0> qty_lamps_1;
+        // Register<2,  Modbus_function::read_03, 0> qty_lamps_2;
+        // Register<3,  Modbus_function::read_03, 0> qty_lamps_3;
+        // Register<4,  Modbus_function::read_03, 0> qty_lamps_4;
+        // Register<5,  Modbus_function::read_03, 0> qty_lamps_5;
+        // Register<6,  Modbus_function::read_03, 0> qty_lamps_6;
+        // Register<7,  Modbus_function::read_03, 0> qty_lamps_7;
+        // Register<8,  Modbus_function::read_03, 0> qty_lamps_8;
+        // Register<9,  Modbus_function::read_03, 0> qty_lamps_9;
+        // Register<10, Modbus_function::read_03, 0> qty_lamps_10;
+        // Register<11, Modbus_function::read_03, 0> qty_lamps_11;
+        // Register<12, Modbus_function::read_03, 0> qty_lamps_12;
+        // Register<13, Modbus_function::read_03, 0> qty_lamps_13;
+        // Register<14, Modbus_function::read_03, 0> qty_lamps_14;
+        // Register<15, Modbus_function::read_03, 0> qty_lamps_15;
 
-        Register<1,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_1;
-        Register<2,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_2;
-        Register<3,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_3;
-        Register<4,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_4;
-        Register<5,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_5;
-        Register<6,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_6;
-        Register<7,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_7;
-        Register<8,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_8;
-        Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
-        Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
-        Register<11, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_11;
-        // Register<12, Modbus_function::read_03, 1> bad_lamps_12;
-        Register<13, Modbus_function::read_03, 1> bad_lamps_13;
-        Register<14, Modbus_function::read_03, 1> bad_lamps_14;
-        Register<15, Modbus_function::read_03, 1> bad_lamps_15;
+        // Register<1,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_1;
+        // Register<2,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_2;
+        // Register<3,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_3;
+        // Register<4,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_4;
+        // Register<5,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_5;
+        // Register<6,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_6;
+        // Register<7,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_7;
+        // Register<8,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_8;
+        // Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
+        // Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
+        // Register<11, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_11;
+        // // Register<12, Modbus_function::read_03, 1> bad_lamps_12;
+        // Register<13, Modbus_function::read_03, 1> bad_lamps_13;
+        // Register<14, Modbus_function::read_03, 1> bad_lamps_14;
+        // Register<15, Modbus_function::read_03, 1> bad_lamps_15;
         
         // FIX 12 временно, при отладке была плата с таким адресом
         Register<12, Modbus_function::read_03, 0> uv_level;
@@ -183,7 +196,7 @@ int main()
         , TX_master
         , RX_master
         , RTS_master
-    > (500_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
+    > (100_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
 
     auto up    = Button<Up>();
     auto down  = Button<Down>();
@@ -240,6 +253,11 @@ int main()
         work_flags.us_started ^= 1;
     });
 
+    // Определение плохих ламп
+    Lamps::make<
+        EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
+    >(modbus_slave.outRegs.lamp, flash.quantity.lamps);
+
     // FIX delete, this for test bad lamps
     modbus_slave.outRegs.quantity.lamps = 49;
     bool even {};
@@ -277,5 +295,4 @@ int main()
 
         __WFI();
     }
-
 }

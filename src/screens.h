@@ -2,6 +2,7 @@
 
 #include "screen_common.h"
 #include <array>
+#include <bitset>
 
 constexpr auto models = std::array {
     "УОВ-ПВ-1",
@@ -133,14 +134,14 @@ struct Bad_lamps_screen : Screen {
     String_buffer& lcd;
     Eventer out_event;
     Callback<> out_callback;
-    const Bit_set<glob::max_lamps>& bad_lamps;
+    const std::bitset<glob::max_lamps>& bad_lamps;
     const uint8_t& qty_lamps;
 
     Bad_lamps_screen (
           String_buffer& lcd
         , Out_event    out_event
         , Out_callback out_callback
-        , Bit_set<glob::max_lamps>& bad_lamps
+        , std::bitset<glob::max_lamps>& bad_lamps
         , uint8_t& qty_lamps
     ) : lcd          {lcd}
       , out_event    {out_event.value}
