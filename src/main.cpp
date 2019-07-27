@@ -15,7 +15,9 @@
 #include "hysteresis.h"
 #include "utils.h"
 #include "flash.h"
+#include "safe_flash.h"
 #include "lamps.h"
+#include "work_count.h"
 
 
 /// эта функция вызывается первой в startup файле
@@ -191,6 +193,16 @@ int main()
         , RTS_master
     > (100_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
 
+    // подсчёт часов работы
+    auto work_count = Work_count{};
+
+    [[maybe_unused]] auto __ = Safe_flash_updater<
+          mcu::FLASH::Sector::_99
+        , mcu::FLASH::Sector::_125
+    >::make (work_count.get_data());
+
+
+
     auto up    = Button<Up>();
     auto down  = Button<Down>();
     auto enter = Tied_buttons(up, down);
@@ -216,7 +228,12 @@ int main()
     auto  uv_button = Button<UV_BTN>();
 
     auto on_uv = [&](bool on = true){
-        flash.count.on += int(on and not uv);
+        if (on and not uv) {
+            flash.count.on++;
+            work_count.start();
+        }
+        if (not on and uv)
+            work_count.stop();
         uv = uv_led = work_flags.uv_on = on;
     };
 
