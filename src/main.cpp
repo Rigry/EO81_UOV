@@ -90,9 +90,12 @@ int main()
             .reset_one = 0,
             .reset_log = 0
         };
-    };
+    } flash;
 
-    Flash<Flash_data, mcu::FLASH::Sector::_127, mcu::FLASH::Sector::_126> flash{};
+    [[maybe_unused]] auto _ = Flash_updater<
+          mcu::FLASH::Sector::_127
+        , mcu::FLASH::Sector::_126
+    >::make (&flash);
 
     struct In_regs {
         UART::Settings uart_set;         // 0

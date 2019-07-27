@@ -26,6 +26,7 @@ C_INCLUDES += -I$(LIBRARY_PATH)/src
 C_INCLUDES += -I$(LIBRARY_PATH)/src/periph
 C_INCLUDES += -I$(LIBRARY_PATH)/src/bits
 C_INCLUDES += -I$(LIBRARY_PATH)/src/middleware
+C_INCLUDES += -I$(LIBRARY_PATH)/magic_get/include
 
 
 #######################################
@@ -125,9 +126,9 @@ test_:
 	$(MAKE) -C ./test/
 
 submodule:
-	git submodule update --init
-	cd mculib3/ && git fetch
-	cd mculib3/ && git checkout $(MCULIB_VERSION)
+	# git submodule update --init
+	# cd mculib3/ && git fetch
+	# cd mculib3/ && git checkout $(MCULIB_VERSION)
   
 #######################################
 # dependencies
