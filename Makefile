@@ -3,7 +3,7 @@ DEBUG = 1
 OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
-MCULIB_VERSION = v1.00
+MCULIB_VERSION = f837bbf38061b751cf4289307a638e155674f22e
 GIT_VERSION := "$(shell git describe --always)"
 
 ######################################
@@ -126,9 +126,10 @@ test_:
 	$(MAKE) -C ./test/
 
 submodule:
-	# git submodule update --init
-	# cd mculib3/ && git fetch
-	# cd mculib3/ && git checkout $(MCULIB_VERSION)
+	git submodule update --init
+	cd mculib3/ && git fetch
+	cd mculib3/ && git checkout $(MCULIB_VERSION)
+	cd mculib3/ && git submodule update --init
   
 #######################################
 # dependencies
