@@ -185,11 +185,12 @@ int main()
     auto work_count = Work_count{
           modbus_slave.outRegs.bad_lamps[0]
         , modbus_slave.outRegs.hours
+        , flash.quantity.lamps
     };
 
     [[maybe_unused]] auto __ = Safe_flash_updater<
-          mcu::FLASH::Sector::_99
-        , mcu::FLASH::Sector::_125
+          mcu::FLASH::Sector::_89
+        , mcu::FLASH::Sector::_115
     >::make (work_count.get_data());
 
     #define ADR(reg) GET_ADR(In_regs, reg)
@@ -211,7 +212,7 @@ int main()
     auto down  = Button<Down>();
     auto enter = Tied_buttons(up, down);
     constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
-    [[maybe_unused]] auto menu = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs);
+    [[maybe_unused]] auto menu = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs, work_count);
 
 
     // алиасы

@@ -6,9 +6,7 @@
 #include "set_screen.h"
 #include "screens.h"
 #include "button.h"
-
-#include "ring_buffer.h"
-RingBuffer<16> tmp;
+#include "work_count.h"
 
 
 
@@ -21,6 +19,7 @@ struct Menu : TickSubscriber {
     Button_event& enter;
     Flash_data&   flash;
     Modbus_regs&  modbus;
+    Work_count&   work_count;
 
     Screen* current_screen {&main_screen};
     size_t tick_count{0};
@@ -40,7 +39,8 @@ struct Menu : TickSubscriber {
         , Button_event& enter
         , Flash_data&   flash
         , Modbus_regs&  modbus
-    ) : up{up}, down{down}, enter{enter}, flash{flash}, modbus{modbus}
+        , Work_count&   work_count
+    ) : up{up}, down{down}, enter{enter}, flash{flash}, modbus{modbus}, work_count{work_count}
     {
         tick_subscribe();
         current_screen->init();
@@ -84,8 +84,7 @@ struct Menu : TickSubscriber {
         , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс всех ламп   ",[this]{
-            std::fill(std::begin(modbus.hours), std::end(modbus.hours), 0);
-            // TODO ещё во flash
+            work_count.reset();
             flash.count.reset_all++;
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
@@ -110,7 +109,7 @@ struct Menu : TickSubscriber {
         , Min<int>{1}, Max<int>{1}
         , Out_callback      { [this]{ change_screen(work_select);  }}
         , Enter_callback    { [this]{
-            modbus.hours[reset_n-1] = 0; // TODO во флэше тоже
+            work_count.reset(reset_n-1);
             flash.count.reset_one++;
             work_time_screen.set_first_lamp(reset_n-1);
             change_screen(work_time_screen);
