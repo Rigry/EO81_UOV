@@ -108,7 +108,7 @@ int main()
         uint16_t uv_level_min;           // 5
         uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
         uint16_t uv_level_highest;       // 7
-        std::array<uint16_t, glob::max_lamps> hours;  // 8
+        std::array<uint16_t, glob::max_extantions+1> reset_hours;  // 8
     }__attribute__((packed));
 
     struct Out_regs {
@@ -279,7 +279,56 @@ int main()
 
     while (1) {
         modbus_master();
-        modbus_slave([](auto){});
+        modbus_slave([&](auto registr){
+            static bool unblock = false;
+            switch (registr) {
+                case ADR(uart_set):
+                    flash.uart_set
+                        = modbus_slave.outRegs.uart_set
+                        = modbus_slave.inRegs.uart_set;
+                break;
+                case ADR(modbus_address):
+                    flash.modbus_address 
+                        = modbus_slave.outRegs.modbus_address
+                        = modbus_slave.inRegs.modbus_address;
+                break;
+                case ADR(password):
+                    unblock = modbus_slave.inRegs.password == 208;
+                break;
+                case ADR(factory_number):
+                    if (unblock) {
+                        unblock = false;
+                        flash.factory_number 
+                            = modbus_slave.outRegs.factory_number
+                            = modbus_slave.inRegs.factory_number;
+                    }
+                    unblock = true;
+                break;
+                case ADR(max_temperature):
+                    flash.max_temperature 
+                        = modbus_slave.outRegs.max_temperature
+                        = modbus_slave.inRegs.max_temperature;
+                break;
+                case ADR(uv_level_min):
+                    flash.uv_level_min 
+                        = modbus_slave.outRegs.uv_level_min
+                        = modbus_slave.inRegs.uv_level_min;
+                break;
+                case ADR(qty_uv_lamps):
+                    flash.quantity.lamps 
+                    = modbus_slave.outRegs.quantity.lamps
+                    = modbus_slave.inRegs.qty_uv_lamps;
+                break;
+                case ADR(uv_level_highest):
+                    flash.quantity.lamps 
+                    = modbus_slave.outRegs.uv_level_highest
+                    = modbus_slave.inRegs.uv_level_highest;
+                break;
+                case ADR(reset_hours): // TODO без плат расширения
+                work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
+                break;
+            } // switch
+        });
 
         modbus_slave.outRegs.temperature = temperature;
 

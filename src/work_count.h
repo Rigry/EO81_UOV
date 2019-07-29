@@ -55,4 +55,11 @@ struct Work_count : TickSubscriber {
             reset(i);
         }
     }
+
+    void reset_by_mask (uint16_t mask) {
+        for (auto i {0}; i < 10; i++) {
+            if ((mask >> i) & 0b1)
+                reset(i);
+        }
+    }
 };
