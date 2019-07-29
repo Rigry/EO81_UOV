@@ -196,10 +196,10 @@ int main()
     // подсчёт часов работы
     auto work_count = Work_count{};
 
-    [[maybe_unused]] auto __ = Safe_flash_updater<
-          mcu::FLASH::Sector::_99
-        , mcu::FLASH::Sector::_125
-    >::make (work_count.get_data());
+    // [[maybe_unused]] auto __ = Safe_flash_updater<
+    //       mcu::FLASH::Sector::_99
+    //     , mcu::FLASH::Sector::_125
+    // >::make (work_count.get_data());
 
 
 

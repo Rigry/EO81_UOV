@@ -179,7 +179,7 @@ struct Bad_lamps_screen : Screen {
         auto bad_qty {0};
         for (auto i {0}; i < qty_lamps ; i++) {
             if ((bad_lamps[0] >> i) & 0b1) {
-                lcd.width(4) << i;
+                lcd.width(4) << i+1;
                 bad_qty++;
             }
             if (bad_qty == max_on_screen) {

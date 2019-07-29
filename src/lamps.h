@@ -62,7 +62,7 @@ private:
         uint16_t tmp{0};
         // TODO сюда бы пинлист из 2-ой библиотеки
         for (auto i{0}; i < lamps_qty; i++) {
-            tmp |= (not *pins[i]) << i;
+            tmp |= *pins[i] << i;
         }
         bad_lamps = tmp;
     }
