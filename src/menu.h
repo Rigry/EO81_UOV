@@ -40,7 +40,8 @@ struct Menu : TickSubscriber {
         , Flash_data&   flash
         , Modbus_regs&  modbus
         , Work_count&   work_count
-    ) : up{up}, down{down}, enter{enter}, flash{flash}, modbus{modbus}, work_count{work_count}
+    ) : up{up}, down{down}, enter{enter}
+      , flash{flash}, modbus{modbus}, work_count{work_count}
     {
         tick_subscribe();
         current_screen->init();
@@ -54,6 +55,8 @@ struct Menu : TickSubscriber {
         , modbus.temperature
         , modbus.uv_level
         , modbus.quantity.lamps
+        , modbus.work_flags
+        , flash.exist
     };
 
     Select_screen<4> main_select {

@@ -212,7 +212,12 @@ int main()
     auto down  = Button<Down>();
     auto enter = Tied_buttons(up, down);
     constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
-    [[maybe_unused]] auto menu = Menu(hd44780_pins, up, down, enter, flash, modbus_slave.outRegs, work_count);
+    [[maybe_unused]] auto menu = Menu (
+        hd44780_pins, up, down, enter
+        , flash
+        , modbus_slave.outRegs
+        , work_count
+    );
 
 
     // алиасы
@@ -227,7 +232,6 @@ int main()
     auto overheat = Hysteresis(temperature, flash.temperature_recovery, flash.max_temperature);
 
     // UV control
-    // TODO уточнить логику у Олега
     auto& uv     = Pin::make<UV_CTRL, mcu::PinMode::Output>();
     auto& uv_led = Pin::make<LED1   , mcu::PinMode::Output>();
     auto  uv_button = Button<UV_BTN>();
@@ -251,7 +255,6 @@ int main()
     });
 
     // US control
-    // TODO уточнить логику у Олега
     auto& us     = Pin::make<US_CTRL, mcu::PinMode::Output>();
     auto& us_led = Pin::make<LED2   , mcu::PinMode::Output>();
     auto  us_button = Button<US_BTN>();
@@ -282,15 +285,19 @@ int main()
 
         work_flags.overheat = overheat;
 
-        set_if_greater (flash.uv_level_highest, uv_level);
-        uv_level_percent = uv_level * 100 / flash.uv_level_highest;
-        work_flags.uv_low_level = uv_level_percent < flash.uv_level_min;
-        
+        if (flash.exist.uv_sensor) {
+            set_if_greater (flash.uv_level_highest, uv_level);
+            uv_level_percent = uv_level * 100 / flash.uv_level_highest;
+            work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+        }
+
         on_us (work_flags.us_started and not overheat);
         on_uv (work_flags.uv_started and not overheat);
 
-        // TODO add other alarms уточнить у Олега
-        alarm_led = work_flags.overheat or work_flags.uv_low_level;
+        // TODO пока без расширений
+        work_flags.bad_lamps = work_flags.uv_on and modbus_slave.outRegs.bad_lamps[0];
+
+        alarm_led = work_flags.is_alarm();
 
         __WFI();
     }

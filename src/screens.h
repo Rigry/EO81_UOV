@@ -90,6 +90,8 @@ struct Main_screen : Screen {
     uint16_t& temperatura;
     uint16_t& uv_level;
     uint8_t&  lamps_qty;
+    Flags&    flags;
+    Exsist&   exist;
 
     Main_screen(
           String_buffer& lcd
@@ -99,6 +101,8 @@ struct Main_screen : Screen {
         , uint16_t& temperatura
         , uint16_t& uv_level
         , uint8_t&  lamps_qty
+        , Flags&    flags
+        , Exsist&   exist
     ) : lcd          {lcd}
       , enter_event  {enter_event.value}
       , out_callback {out_callback.value}
@@ -106,6 +110,8 @@ struct Main_screen : Screen {
       , temperatura  {temperatura}
       , uv_level     {uv_level}
       , lamps_qty    {lamps_qty}
+      , flags        {flags}
+      , exist        {exist}
     {}
 
     void init() override {
@@ -113,12 +119,8 @@ struct Main_screen : Screen {
         lcd.clear();
         lcd.line(0).center() << models[model_n];
 
-        lcd.line(1) << "Ламп:" << lamps_qty;
-        lcd.line(2) << "Авария:никаких" << next_line;
-        lcd         << "t"; 
-        lcd.width(3) << temperatura << "C";
-        lcd.line(3).cursor(8) << "УФ";
-        lcd.line(3).cursor(14)<< "УЗ";
+        lcd.line(1) << "Ламп: " << lamps_qty;
+        lcd.line(2) << "Авария: " << next_line;
     }
     
     void deinit() override {
@@ -126,7 +128,39 @@ struct Main_screen : Screen {
     }
 
     void draw() override {
-        lcd.line(3).cursor(3).width(3) << temperatura;
+        lcd.line(1).cursor(6) << lamps_qty << next_line;
+        if (exist.temp_sensor) {
+            lcd.line(3) << "t ";
+            lcd.width(2) << temperatura << 'C';
+        }
+        
+        lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");
+        if (exist.uv_sensor) {
+            if (flags.uv_on)
+                lcd.cursor(9).width(3) << uv_level << "%";
+            else
+                lcd.cursor(9) << "    ";
+        }
+
+        lcd.cursor(15) << (flags.us_on ? "УЗ" : "  ");
+
+        lcd.line(2).cursor(8);
+        if (not flags.is_alarm() ) {
+            lcd << "нет" << next_line;
+            return;
+        }
+        if (flags.overheat) {
+            lcd << "ПЕРЕГРЕВ" << next_line;
+            return;
+        }
+        if (flags.bad_lamps) {
+            lcd << "ЛАМПЫ " << next_line;
+            return;
+        }
+        if (flags.uv_low_level) {
+            lcd << "УРОВЕНЬ" << next_line;
+            return;
+        }
     }
 };
 
