@@ -135,18 +135,6 @@ int main()
         , RTS_slave
     >(flash.modbus_address, flash.uart_set);
 
-    #define ADR(reg) GET_ADR(In_regs, reg)
-    modbus_slave.outRegs.device_code       = 8; 
-    modbus_slave.outRegs.factory_number    = flash.factory_number;
-    modbus_slave.outRegs.uart_set          = flash.uart_set;
-    modbus_slave.outRegs.modbus_address    = flash.modbus_address;
-    modbus_slave.outRegs.quantity          = flash.quantity;
-    modbus_slave.arInRegsMax[ADR(uart_set)]= 0b11111111;
-    modbus_slave.inRegsMin.modbus_address  = 1;
-    modbus_slave.inRegsMax.modbus_address  = 255;
-    modbus_slave.inRegsMin.qty_uv_lamps    = 1;
-    modbus_slave.inRegsMax.qty_uv_lamps    = 10;
-
     struct {
         // TODO пока без модулей расширения
         // Register<1,  Modbus_function::read_03, 0> qty_lamps_1;
@@ -194,14 +182,30 @@ int main()
     > (100_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
 
     // подсчёт часов работы
-    auto work_count = Work_count{};
+    auto work_count = Work_count{
+          modbus_slave.outRegs.bad_lamps[0]
+        , modbus_slave.outRegs.hours
+    };
 
     // [[maybe_unused]] auto __ = Safe_flash_updater<
     //       mcu::FLASH::Sector::_99
     //     , mcu::FLASH::Sector::_125
     // >::make (work_count.get_data());
 
-
+    #define ADR(reg) GET_ADR(In_regs, reg)
+    modbus_slave.outRegs.device_code       = 8; 
+    modbus_slave.outRegs.factory_number    = flash.factory_number;
+    modbus_slave.outRegs.uart_set          = flash.uart_set;
+    modbus_slave.outRegs.modbus_address    = flash.modbus_address;
+    modbus_slave.outRegs.quantity          = flash.quantity;
+    for (auto i{0}; i < 10; i++)
+        modbus_slave.outRegs.hours[i] = work_count.get_hours(i);
+    modbus_slave.arInRegsMax[ADR(uart_set)]= 0x0F;
+    modbus_slave.inRegsMin.modbus_address  = 1;
+    modbus_slave.inRegsMax.modbus_address  = 255;
+    modbus_slave.inRegsMin.qty_uv_lamps    = 1;
+    modbus_slave.inRegsMax.qty_uv_lamps    = 10;
+    
 
     auto up    = Button<Up>();
     auto down  = Button<Down>();
