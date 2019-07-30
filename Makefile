@@ -3,15 +3,15 @@ DEBUG = 1
 OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
-MCULIB_VERSION = f837bbf38061b751cf4289307a638e155674f22e
-GIT_VERSION := "$(shell git describe --always)"
+MCULIB_VERSION = v1.03
+GIT_VERSION := "$(shell git describe --always --tags)"
 
 ######################################
 # source
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
-LIBRARY_PATH = ../mculib3
-MCULIB_GIT_VERSION := "$(shell cd $(LIBRARY_PATH) && git describe --always)"
+LIBRARY_PATH = mculib3
+MCULIB_GIT_VERSION := "$(shell cd $(LIBRARY_PATH) && git describe --always --tags)"
 
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s
