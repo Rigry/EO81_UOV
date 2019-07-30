@@ -196,7 +196,7 @@ int main()
     >::make (work_count.get_data());
 
     #define ADR(reg) GET_ADR(In_regs, reg)
-    modbus_slave.outRegs.device_code       = 8; 
+    modbus_slave.outRegs.device_code       = 8;
     modbus_slave.outRegs.factory_number    = flash.factory_number;
     modbus_slave.outRegs.uart_set          = flash.uart_set;
     modbus_slave.outRegs.modbus_address    = flash.modbus_address;
