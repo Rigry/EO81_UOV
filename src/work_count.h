@@ -5,8 +5,8 @@
 #include "timers.h"
 
 namespace {
-    constexpr auto remember_every        {10000};
-    constexpr auto update_every_remember {1};
+    constexpr auto remember_every        {60000};
+    constexpr auto update_every_remember {60};
 }
 
 // каждая плата расширения будет считать свои лампы

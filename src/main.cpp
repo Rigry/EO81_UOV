@@ -127,8 +127,10 @@ int main()
         std::array<uint16_t, glob::max_lamps> hours;       // 22
     }; // __attribute__((packed)); // TODO error: cannot bind packed field 
 
-    // оптимизировал, неудобно отлаживать, потому volatile
-    volatile decltype(auto) modbus_slave = Modbus_slave<In_regs, Out_regs>::make <
+    // колбеки для коилов далее
+    constexpr auto coils_qty {2};
+    // неудобно отлаживать, потому volatile
+    volatile decltype(auto) modbus_slave = Modbus_slave<In_regs, Out_regs, coils_qty>::make <
           mcu::Periph::USART1
         , TX_slave
         , RX_slave
@@ -270,6 +272,20 @@ int main()
         }
         work_flags.us_started ^= 1;
     });
+
+    // управление по модбас
+    modbus_slave.force_single_coil_05[0] = [&](bool on) {
+        if (on and not overheat)
+            work_flags.us_started = true;
+        if (not on)
+            work_flags.us_started = false;
+    };
+    modbus_slave.force_single_coil_05[1] = [&](bool on) {
+        if (on and not overheat)
+            work_flags.uv_started = true;
+        if (not on)
+            work_flags.uv_started = false;
+    };
 
     // Определение плохих ламп
     Lamps::make<
