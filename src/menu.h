@@ -269,7 +269,7 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , "Кол-во ламп тут"
         , flash.quantity.lamps
-        , Min<uint8_t>{1}, Max<uint8_t>{glob::max_lamps}
+        , Min<uint8_t>{1}, Max<uint8_t>{10}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , Enter_callback  { [this]{
             modbus.quantity = flash.quantity;
