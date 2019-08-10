@@ -92,6 +92,7 @@ struct Main_screen : Screen {
     uint8_t&  lamps_qty;
     Flags&    flags;
     Exsist&   exist;
+    int _ {0}; // без этой фигни оптимизатор чудил
 
     Main_screen(
           String_buffer& lcd
@@ -122,9 +123,9 @@ struct Main_screen : Screen {
         lcd.line(1) << "Ламп: " << lamps_qty;
         lcd.line(2) << "Авария: " << next_line;
     }
-    
+
     void deinit() override {
-        enter_event (null_function);
+        enter_event (nullptr);
     }
 
     void draw() override {
@@ -137,12 +138,12 @@ struct Main_screen : Screen {
         lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");
         if (exist.uv_sensor) {
             if (flags.uv_on)
-                lcd.cursor(9).width(3) << uv_level << "%";
+                lcd.cursor(10).width(3) << uv_level << "%";
             else
-                lcd.cursor(9) << "    ";
+                lcd.cursor(10) << "    ";
         }
 
-        lcd.cursor(15) << (flags.us_on ? "УЗ" : "  ");
+        lcd.cursor(16) << (flags.us_on ? "УЗ" : "  ");
 
         lcd.line(2).cursor(8);
         if (not flags.is_alarm() ) {
@@ -191,7 +192,7 @@ struct Bad_lamps_screen : Screen {
         out_event ([this]{ out_callback(); });
     }
     void deinit() override {
-        out_event (null_function);
+        out_event (nullptr);
     }
     void draw() override {
         lcd.line(0);
@@ -251,9 +252,9 @@ struct Work_time_screen : Screen {
         redraw();
     }
     void deinit() override {
-        eventers.up    (null_function);
-        eventers.down  (null_function);
-        eventers.out   (null_function);
+        eventers.up    (nullptr);
+        eventers.down  (nullptr);
+        eventers.out   (nullptr);
     }
 
     void draw() override {}
@@ -323,9 +324,9 @@ struct Config_screen : Screen {
         redraw();
     }
     void deinit() override {
-        eventers.up    (null_function);
-        eventers.down  (null_function);
-        eventers.out   (null_function);
+        eventers.up    (nullptr);
+        eventers.down  (nullptr);
+        eventers.out   (nullptr);
     }
 
     void draw() override {}
@@ -430,10 +431,10 @@ struct Password_screen : Screen {
         redraw();
     }
     void deinit() override {
-        eventers.up    (null_function);
-        eventers.down  (null_function);
-        eventers.out   (null_function);
-        eventers.enter (null_function);
+        eventers.up    (nullptr);
+        eventers.down  (nullptr);
+        eventers.out   (nullptr);
+        eventers.enter (nullptr);
     }
 
     void draw() override {}
@@ -506,7 +507,7 @@ struct Log_screen : Screen {
         lcd.width(5) << count.reset_log;
     }
     void deinit() override {
-        out_event (null_function);
+        out_event (nullptr);
     }
     void draw() override {}
 };

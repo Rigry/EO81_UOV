@@ -29,6 +29,8 @@ struct Menu : TickSubscriber {
         , Down_event  { [this](auto c){ down.set_click_callback(c);}     }
         , Enter_event { [this](auto c){enter.set_click_callback(c);}     }
         , Out_event   { [this](auto c){enter.set_long_push_callback(c);} }
+        , Increment_up_event   { [this](auto c){  up.set_increment_callback(c);} }
+        , Increment_down_event { [this](auto c){down.set_increment_callback(c);} }
     };
 
 
