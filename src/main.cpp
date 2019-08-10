@@ -161,8 +161,8 @@ int main()
         // Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
         // Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
 
-        Register<15, Modbus_function::read_03, 0> uv_level;
-        Register<15, Modbus_function::read_03, 1> temperature;
+        Register<11, Modbus_function::read_03, 0> uv_level;
+        Register<11, Modbus_function::read_03, 1> temperature;
     } modbus_master_regs;
 
     decltype(auto) modbus_master = make_modbus_master <
