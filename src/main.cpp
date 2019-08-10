@@ -149,11 +149,6 @@ int main()
         // Register<8,  Modbus_function::read_03, 0> qty_lamps_8;
         // Register<9,  Modbus_function::read_03, 0> qty_lamps_9;
         // Register<10, Modbus_function::read_03, 0> qty_lamps_10;
-        // Register<11, Modbus_function::read_03, 0> qty_lamps_11;
-        // Register<12, Modbus_function::read_03, 0> qty_lamps_12;
-        // Register<13, Modbus_function::read_03, 0> qty_lamps_13;
-        // Register<14, Modbus_function::read_03, 0> qty_lamps_14;
-        // Register<15, Modbus_function::read_03, 0> qty_lamps_15;
 
         // Register<1,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_1;
         // Register<2,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_2;
@@ -165,15 +160,9 @@ int main()
         // Register<8,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_8;
         // Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
         // Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
-        // Register<11, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_11;
-        // // Register<12, Modbus_function::read_03, 1> bad_lamps_12;
-        // Register<13, Modbus_function::read_03, 1> bad_lamps_13;
-        // Register<14, Modbus_function::read_03, 1> bad_lamps_14;
-        // Register<15, Modbus_function::read_03, 1> bad_lamps_15;
-        
-        // FIX 12 временно, при отладке была плата с таким адресом
-        Register<12, Modbus_function::read_03, 0> uv_level;
-        Register<12, Modbus_function::read_03, 1> temperature;
+
+        Register<15, Modbus_function::read_03, 0> uv_level;
+        Register<15, Modbus_function::read_03, 1> temperature;
     } modbus_master_regs;
 
     decltype(auto) modbus_master = make_modbus_master <
