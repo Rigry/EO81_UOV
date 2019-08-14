@@ -350,7 +350,7 @@ private:
             line_cnt++;
         }
         if (from_line <= 2) {
-            lcd << "Плата датчиков: " << (exist.board_sensor ? '+' : '-') << next_line;
+            lcd << "Плата датчиков: " << (exist.temp_sensor or exist.uv_sensor ? '+' : '-') << next_line;
             line_cnt++;
         }
         if (from_line <= 3) {

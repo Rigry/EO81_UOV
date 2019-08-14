@@ -231,7 +231,7 @@ struct Menu : TickSubscriber {
     };
 
     int confirm;
-    Select_screen<10> tech_select {
+    Select_screen<9> tech_select {
           lcd, buttons_events
         , Out_callback        { [this]{ change_screen(config_select);           }}
         , Line {"Наименование"       ,[this]{ change_screen(name_set);          }}
@@ -244,7 +244,6 @@ struct Menu : TickSubscriber {
             confirm = 0;
             change_screen(log_reset);
         }}
-        , Line {"Плата датчиков"     ,[this]{ change_screen(sens_board_set); }}
         , Line {"Датчик температуры" ,[this]{ change_screen(sens_temp_set);  }}
         , Line {"Датчик УФ"          ,[this]{ change_screen(sens_uv_set);    }}
     };
@@ -326,19 +325,6 @@ struct Menu : TickSubscriber {
                 flash.count.reset_one = 0;
                 flash.count.reset_log++;
             }
-            change_screen(tech_select);
-        }}
-    };
-
-    int board_sensor {flash.exist.board_sensor};
-    Set_screen<int, exist_to_string> sens_board_set {
-          lcd, buttons_events
-        , "Плата датчиков"
-        , board_sensor
-        , Min<int>{0}, Max<int>{1}
-        , Out_callback    { [this]{ change_screen(tech_select); }}
-        , Enter_callback  { [this]{ 
-            flash.exist.board_sensor = bool(board_sensor);
             change_screen(tech_select);
         }}
     };
