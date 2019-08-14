@@ -3,7 +3,7 @@ DEBUG = 1
 OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
-MCULIB_VERSION = develop
+MCULIB_VERSION = v1.04
 GIT_VERSION := "$(shell git describe --always --tags)"
 
 ######################################
@@ -11,8 +11,6 @@ GIT_VERSION := "$(shell git describe --always --tags)"
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
 LIBRARY_PATH = mculib3
-MCULIB_GIT_VERSION := "$(shell cd $(LIBRARY_PATH) && git describe --always --tags)"
-
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s
 LDSCRIPT_F1 = $(LIBRARY_PATH)/STM32F1_files/STM32F103RBTx_FLASH.ld
@@ -59,7 +57,7 @@ MCU_F1 = $(CPU_F1) -mthumb $(FPU_F1) $(FLOAT-ABI_F1)
 # compile gcc flags
 ASFLAGS_F1 = $(MCU_F1) $(OPT) -Wall -fdata-sections -ffunction-sections
 
-CFLAGS_F1  = -DMCULIB_VERSION=\"$(MCULIB_GIT_VERSION)\" -DVERSION=\"$(GIT_VERSION)\"
+CFLAGS_F1  = -DVERSION=\"$(GIT_VERSION)\"
 CFLAGS_F1 += $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
 CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -fexec-charset=cp1251
 CFLAGS_F1 += -g -gdwarf-2 
@@ -94,8 +92,9 @@ vpath %.s $(sort $(dir $(ASM_SOURCES_F1)))
 
 
 
-$(BUILD_DIR)/main.o:$(CPP_SOURCES_F1) Makefile | $(BUILD_DIR) 
-	$(CPP) -c $(CFLAGS_F1) $(CPPSTD) -fno-rtti -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cpp=.lst)) $< -o $@
+$(BUILD_DIR)/main.o:$(CPP_SOURCES_F1) Makefile | $(BUILD_DIR)
+	$(eval MCULIB_GIT_VERSION := "$(shell cd $(LIBRARY_PATH) && git describe --always --tags)")
+	$(CPP) -c -DMCULIB_VERSION=\"$(MCULIB_GIT_VERSION)\" $(CFLAGS_F1) $(CPPSTD) -fno-rtti -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.cpp=.lst)) $< -o $@
 
 $(BUILD_DIR)/startup_stm32f103xb.o: $(ASM_SOURCES_F1) Makefile | $(BUILD_DIR)
 	$(AS) -c $(CFLAGS_F1) $< -o $@
