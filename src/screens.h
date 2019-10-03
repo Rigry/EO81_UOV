@@ -132,7 +132,7 @@ struct Main_screen : Screen {
         lcd.line(1).cursor(6) << lamps_qty << next_line;
         if (exist.temp_sensor) {
             lcd.line(3) << "t ";
-            lcd.width(2) << temperatura << 'C';
+            lcd.width(2) << temperatura << "C  ";
         }
         
         lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");

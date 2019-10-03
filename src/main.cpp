@@ -334,7 +334,12 @@ int main()
             } // switch
         });
 
+        overheat.set_min(flash.temperature_recovery);
+        overheat.set_max(flash.max_temperature);
         modbus_slave.outRegs.temperature = temperature;
+        modbus_slave.outRegs.max_temperature = flash.max_temperature;
+        modbus_slave.outRegs.uv_level_min = flash.uv_level_min;
+        modbus_slave.outRegs.uv_level = uv_level_percent;
         
 
         work_flags.overheat = overheat;
