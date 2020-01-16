@@ -223,7 +223,7 @@ int main()
 
     // UV control
     auto& uv     = Pin::make<UV_CTRL, mcu::PinMode::Output>();
-    auto& uv_led = Pin::make<LED1   , mcu::PinMode::Output>();
+    auto& uv_led = Pin::make<LED2   , mcu::PinMode::Output>();
     auto  uv_button = Button<UV_BTN>();
 
     auto on_uv = [&](bool on = true){
@@ -246,7 +246,7 @@ int main()
 
     // US control
     auto& us     = Pin::make<US_CTRL, mcu::PinMode::Output>();
-    auto& us_led = Pin::make<LED2   , mcu::PinMode::Output>();
+    auto& us_led = Pin::make<LED1   , mcu::PinMode::Output>();
     auto  us_button = Button<US_BTN>();
 
     auto on_us = [&](bool on = true){
