@@ -80,7 +80,14 @@ constexpr std::string_view parity_to_string(int i) {
     return parity[i];
 }
 
+constexpr auto mode = std::array {
+    "Пользовательский",
+    "Автоматический"
+};
 
+constexpr std::string_view mode_to_string(int i) {
+    return mode[i];
+}
 
 struct Main_screen : Screen {
     String_buffer& lcd;
@@ -161,6 +168,9 @@ struct Main_screen : Screen {
         if (flags.uv_low_level) {
             lcd << "УРОВЕНЬ" << next_line;
             return;
+        }
+        if (not flags.flow) {
+            lcd << "НАСОС" << next_line;
         }
     }
 };

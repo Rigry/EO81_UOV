@@ -54,8 +54,10 @@ using EPRA5  = mcu::PA4;
 using EPRA6  = mcu::PA5;
 using EPRA7  = mcu::PA6;
 using EPRA8  = mcu::PA7;
-using EPRA9  = mcu::PC4;
-using EPRA10 = mcu::PC5;
+
+
+using RC     = mcu::PC4;
+using PUMP   = mcu::PC5;
 
 
 
@@ -91,6 +93,7 @@ int main()
             .reset_one = 0,
             .reset_log = 0
         };
+        bool automatic = false;
     } flash;
 
     [[maybe_unused]] auto _ = Flash_updater<
@@ -189,7 +192,7 @@ int main()
     modbus_slave.outRegs.uart_set          = flash.uart_set;
     modbus_slave.outRegs.modbus_address    = flash.modbus_address;
     modbus_slave.outRegs.quantity          = flash.quantity;
-    for (auto i{0}; i < 10; i++)
+    for (auto i{0}; i < 9; i++)
         modbus_slave.outRegs.hours[i] = work_count.get_hours(i);
     modbus_slave.arInRegsMax[ADR(uart_set)]= 0x0F;
     modbus_slave.inRegsMin.modbus_address  = 1;
@@ -218,6 +221,8 @@ int main()
 
 
     auto& alarm_led = Pin::make<LED3, mcu::PinMode::Output>();
+
+    auto& flow = Pin::make<PUMP, mcu::PinMode::Input>();
 
     auto overheat = Hysteresis(temperature, flash.temperature_recovery, flash.max_temperature);
 
@@ -350,8 +355,13 @@ int main()
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
         }
 
-        on_us (work_flags.us_started and not overheat);
-        on_uv (work_flags.uv_started and not overheat);
+        if (flash.automatic) {
+            // on_us (not overheat and flow);
+            on_uv (not overheat and flow);
+        } else {
+            // on_us (work_flags.us_started and not overheat);
+            on_uv (work_flags.uv_started and not overheat);
+        }
 
         // TODO пока без расширений
         work_flags.bad_lamps = work_flags.uv_on and modbus_slave.outRegs.bad_lamps[0];

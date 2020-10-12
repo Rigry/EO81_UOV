@@ -61,13 +61,27 @@ struct Menu : TickSubscriber {
         , flash.exist
     };
 
-    Select_screen<4> main_select {
+    Select_screen<5> main_select {
           lcd, buttons_events
         , Out_callback       { [this]{ change_screen(main_screen);  }}
         , Line {"Аварии"      ,[this]{ change_screen(alarm_select); }}
         , Line {"Наработка"   ,[this]{ change_screen(work_select);  }}
         , Line {"Конфигурация",[this]{ change_screen(config_select);}}
         , Line {"Лог работы"  ,[this]{ change_screen(log_screen);   }}
+        , Line {"Режим работы",[this]{ change_screen(mode_screen);  }}
+    };
+
+    bool mode {flash.automatic};
+    Set_screen<bool, mode_to_string> mode_screen {
+          lcd, buttons_events
+        , "Режим работы"
+        , mode
+        , Min<bool>{false}, Max<bool>{true}
+        , Out_callback    { [this]{ change_screen(main_select); }}
+        , Enter_callback  { [this]{ 
+            flash.automatic = modbus.work_flags.mode = mode;
+            change_screen(main_select);
+        }}
     };
 
     Select_screen<3> alarm_select {
