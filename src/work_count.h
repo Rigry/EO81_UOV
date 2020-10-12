@@ -12,7 +12,7 @@ namespace {
 // каждая плата расширения будет считать свои лампы
 // поэтому тут только 10
 struct Minutes {
-    std::array<uint32_t, 10> data {0};
+    std::array<uint32_t, 8> data {0};
 };
 
 // считает время работы каждой лампы в минутах
@@ -51,13 +51,13 @@ struct Work_count : TickSubscriber {
     }
 
     void reset () {
-        for (auto i {0}; i < 10; i++) {
+        for (auto i {0}; i < 9; i++) {
             reset(i);
         }
     }
 
     void reset_by_mask (uint16_t mask) {
-        for (auto i {0}; i < 10; i++) {
+        for (auto i {0}; i < 9; i++) {
             if ((mask >> i) & 0b1)
                 reset(i);
         }

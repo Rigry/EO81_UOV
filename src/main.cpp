@@ -277,7 +277,7 @@ int main()
 
     // Определение плохих ламп
     Lamps::make<
-        EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
+        EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8
     >(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
 
 
