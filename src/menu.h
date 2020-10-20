@@ -231,11 +231,13 @@ struct Menu : TickSubscriber {
     };
 
     int confirm;
-    Select_screen<9> tech_select {
+    Select_screen<10> tech_select {
           lcd, buttons_events
         , Out_callback        { [this]{ change_screen(config_select);           }}
         , Line {"Наименование"       ,[this]{ change_screen(name_set);          }}
-        , Line {"Сброс максимума УФ" ,[this]{ change_screen(max_uv_set);        }}
+        , Line {"Максимум УФ"        ,[this]{ change_screen(max_uv_set);        }}
+        , Line {"Сброс максимума УФ" ,[this]{ confirm = 0; 
+                                              change_screen(max_uv_reset);      }}
         , Line {"Кол-во ламп тут"    ,[this]{ change_screen(qty_lamps_set);     }}
         , Line {"Кол-во расширений"  ,[this]{ change_screen(qty_extentions_set);}}
         , Line {"Макс. температура"  ,[this]{ change_screen(max_temp_set);      }}
@@ -262,6 +264,20 @@ struct Menu : TickSubscriber {
         , flash.uv_level_highest
         , Min<uint16_t>{0}, Max<uint16_t>{0xFFFF}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
+    };
+
+    Set_screen<int, confirm_to_string> max_uv_reset {
+          lcd, buttons_events
+        , "Сбросить макс УФ?"
+        , confirm
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select);  }}
+        , Enter_callback  { [this]{
+            if (confirm) {
+                flash.uv_level_highest = 0;
+            }
+            change_screen(tech_select);
+        }}
     };
 
     Set_screen<uint8_t> qty_lamps_set {
@@ -300,7 +316,7 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , "Темп. восстановл."
         , flash.temperature_recovery
-        , Min<uint8_t>{20}, Max<uint8_t>{glob::max_temperature}
+        , Min<uint8_t>{10}, Max<uint8_t>{glob::max_temperature}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
     };
 
