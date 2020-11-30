@@ -223,7 +223,6 @@ int main()
     auto& alarm_led = Pin::make<LED3, mcu::PinMode::Output>();
 
     auto& not_flow = Pin::make<PUMP, mcu::PinMode::Input>();
-    volatile bool f{false};
 
     auto overheat = Hysteresis(temperature, flash.temperature_recovery, flash.max_temperature);
 
@@ -357,11 +356,11 @@ int main()
         }
 
         if (flash.automatic) {
-            // on_us ((not overheat) and flow);
+            on_us (not overheat and not not_flow);
             on_uv (not overheat and not not_flow);
             work_flags.uv_started = false;
         } else {
-            // on_us (work_flags.us_started and not overheat);
+            on_us (work_flags.us_started and not overheat);
             on_uv (work_flags.uv_started and not overheat);
         }
 
