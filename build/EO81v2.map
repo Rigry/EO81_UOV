@@ -2790,17 +2790,17 @@ LOAD /home/users/aag/code/gcc-arm-none-eabi-7-2018-q2-update/bin/../lib/gcc/arm-
                 0x000000000800abe0       0x66 build/main.o
                 0x000000000800abe0                bool* std::__find_if<bool*, __gnu_cxx::__ops::_Iter_equals_val<bool const> >(bool*, bool*, __gnu_cxx::__ops::_Iter_equals_val<bool const>, std::random_access_iterator_tag)
  *fill*         0x000000000800ac46        0x2 
- .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE107ELS3_108ELS3_109ELS3_110ELS3_111ELS3_112ELS3_113ELS3_114ELS3_115EEE6notifyEv
-                0x000000000800ac48      0x1ec build/main.o
-                0x000000000800ac48                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)107, (mcu::FLASH::Sector)108, (mcu::FLASH::Sector)109, (mcu::FLASH::Sector)110, (mcu::FLASH::Sector)111, (mcu::FLASH::Sector)112, (mcu::FLASH::Sector)113, (mcu::FLASH::Sector)114, (mcu::FLASH::Sector)115>::notify()
- .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE98ELS3_99ELS3_100ELS3_101ELS3_102ELS3_103ELS3_104ELS3_105ELS3_106EEE6notifyEv
-                0x000000000800ae34      0x1ec build/main.o
-                0x000000000800ae34                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)98, (mcu::FLASH::Sector)99, (mcu::FLASH::Sector)100, (mcu::FLASH::Sector)101, (mcu::FLASH::Sector)102, (mcu::FLASH::Sector)103, (mcu::FLASH::Sector)104, (mcu::FLASH::Sector)105, (mcu::FLASH::Sector)106>::notify()
- .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE89ELS3_90ELS3_91ELS3_92ELS3_93ELS3_94ELS3_95ELS3_96ELS3_97EEE6notifyEv
-                0x000000000800b020      0x1ec build/main.o
-                0x000000000800b020                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)89, (mcu::FLASH::Sector)90, (mcu::FLASH::Sector)91, (mcu::FLASH::Sector)92, (mcu::FLASH::Sector)93, (mcu::FLASH::Sector)94, (mcu::FLASH::Sector)95, (mcu::FLASH::Sector)96, (mcu::FLASH::Sector)97>::notify()
  .text._ZN18Flash_updater_implIZ4mainE10Flash_dataJLN3mcu5FLASH6SectorE127ELS3_126EEE6notifyEv
-                0x000000000800b20c      0x1f4 build/main.o
+                0x000000000800ac48      0x1f4 build/main.o
+ .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE107ELS3_108ELS3_109ELS3_110ELS3_111ELS3_112ELS3_113ELS3_114ELS3_115EEE6notifyEv
+                0x000000000800ae3c      0x1ec build/main.o
+                0x000000000800ae3c                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)107, (mcu::FLASH::Sector)108, (mcu::FLASH::Sector)109, (mcu::FLASH::Sector)110, (mcu::FLASH::Sector)111, (mcu::FLASH::Sector)112, (mcu::FLASH::Sector)113, (mcu::FLASH::Sector)114, (mcu::FLASH::Sector)115>::notify()
+ .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE98ELS3_99ELS3_100ELS3_101ELS3_102ELS3_103ELS3_104ELS3_105ELS3_106EEE6notifyEv
+                0x000000000800b028      0x1ec build/main.o
+                0x000000000800b028                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)98, (mcu::FLASH::Sector)99, (mcu::FLASH::Sector)100, (mcu::FLASH::Sector)101, (mcu::FLASH::Sector)102, (mcu::FLASH::Sector)103, (mcu::FLASH::Sector)104, (mcu::FLASH::Sector)105, (mcu::FLASH::Sector)106>::notify()
+ .text._ZN18Flash_updater_implI7MinutesJLN3mcu5FLASH6SectorE89ELS3_90ELS3_91ELS3_92ELS3_93ELS3_94ELS3_95ELS3_96ELS3_97EEE6notifyEv
+                0x000000000800b214      0x1ec build/main.o
+                0x000000000800b214                Flash_updater_impl<Minutes, (mcu::FLASH::Sector)89, (mcu::FLASH::Sector)90, (mcu::FLASH::Sector)91, (mcu::FLASH::Sector)92, (mcu::FLASH::Sector)93, (mcu::FLASH::Sector)94, (mcu::FLASH::Sector)95, (mcu::FLASH::Sector)96, (mcu::FLASH::Sector)97>::notify()
  .text.startup._GLOBAL__sub_I__ZN3mcu5FLASH6unlockEv
                 0x000000000800b400      0x178 build/main.o
  .text.Reset_Handler
@@ -3637,9 +3637,9 @@ OUTPUT(build/EO81v2.elf elf32-littlearm)
  .debug_ranges  0x0000000000000000     0x9910 build/main.o
  .debug_ranges  0x0000000000009910       0x20 build/startup_stm32f103xb.o
 
-.debug_line     0x0000000000000000     0xb983
- .debug_line    0x0000000000000000     0xb8fb build/main.o
- .debug_line    0x000000000000b8fb       0x88 build/startup_stm32f103xb.o
+.debug_line     0x0000000000000000     0xb98d
+ .debug_line    0x0000000000000000     0xb905 build/main.o
+ .debug_line    0x000000000000b905       0x88 build/startup_stm32f103xb.o
 
 .debug_str      0x0000000000000000    0x9ca69
  .debug_str     0x0000000000000000    0x9ca2f build/main.o

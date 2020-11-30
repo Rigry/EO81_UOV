@@ -358,6 +358,7 @@ int main()
         if (flash.automatic) {
             on_us (not overheat and not not_flow);
             on_uv (not overheat and not not_flow);
+            work_flags.us_started = false;
             work_flags.uv_started = false;
         } else {
             on_us (work_flags.us_started and not overheat);
