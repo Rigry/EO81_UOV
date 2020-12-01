@@ -72,12 +72,12 @@ struct Menu : TickSubscriber {
         , Line {"Режим работы",[this]{ change_screen(mode_screen);  }}
     };
 
-    bool mode {flash.automatic};
-    Set_screen<bool, mode_to_string> mode_screen {
+    int mode {flash.automatic};
+    Set_screen<int, mode_to_string> mode_screen {
           lcd, buttons_events
         , "Режим работы"
         , mode
-        , Min<bool>{false}, Max<bool>{true}
+        , Min<int>{0}, Max<int>{1}
         , Out_callback    { [this]{ change_screen(main_select); }}
         , Enter_callback  { [this]{ 
             flash.automatic = modbus.work_flags.mode = mode;
