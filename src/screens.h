@@ -81,7 +81,7 @@ constexpr std::string_view parity_to_string(int i) {
 }
 
 constexpr auto mode = std::array {
-    "Пользовательский",
+    "Ручной",
     "Автоматический"
 };
 
@@ -169,7 +169,7 @@ struct Main_screen : Screen {
             lcd << "УРОВЕНЬ" << next_line;
             return;
         }
-        if (not flags.flow) {
+        if (flags.flow) {
             lcd << "НАСОС" << next_line;
         }
     }
