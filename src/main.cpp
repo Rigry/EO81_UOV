@@ -362,7 +362,7 @@ int main()
             on_uv (work_flags.uv_started and not overheat);
         }
 
-        work_flags.flow = flow;
+        work_flags.flow = not flow;
 
         // TODO пока без расширений
         work_flags.bad_lamps = work_flags.uv_on and modbus_slave.outRegs.bad_lamps[0];
