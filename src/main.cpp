@@ -55,11 +55,8 @@ using EPRA6  = mcu::PA5;
 using EPRA7  = mcu::PA6;
 using EPRA8  = mcu::PA7;
 
-
 using RC     = mcu::PC4;
 using PUMP   = mcu::PC5;
-
-
 
 int main()
 {
