@@ -82,7 +82,7 @@ constexpr std::string_view parity_to_string(int i) {
 
 constexpr auto mode = std::array {
     "Ручной",
-    "Автоматический"
+    "Авто"
 };
 
 constexpr std::string_view mode_to_string(int i) {
@@ -99,6 +99,7 @@ struct Main_screen : Screen {
     uint8_t&  lamps_qty;
     Flags&    flags;
     Exsist&   exist;
+    bool&     mode;
     int _ {0}; // без этой фигни оптимизатор чудил
 
     Main_screen(
@@ -111,6 +112,7 @@ struct Main_screen : Screen {
         , uint8_t&  lamps_qty
         , Flags&    flags
         , Exsist&   exist
+        , bool&     mode
     ) : lcd          {lcd}
       , enter_event  {enter_event.value}
       , out_callback {out_callback.value}
@@ -120,6 +122,7 @@ struct Main_screen : Screen {
       , lamps_qty    {lamps_qty}
       , flags        {flags}
       , exist        {exist}
+      , mode         {mode}
     {}
 
     void init() override {
@@ -127,7 +130,8 @@ struct Main_screen : Screen {
         lcd.clear();
         lcd.line(0).center() << models[model_n];
 
-        lcd.line(1) << "Ламп: " << lamps_qty;
+        lcd.line(1) << "Ламп:" << lamps_qty;
+        lcd.line(1).cursor(8) << "Режим:" << ::mode[mode];
         lcd.line(2) << "Авария: " << next_line;
     }
 
@@ -136,13 +140,15 @@ struct Main_screen : Screen {
     }
 
     void draw() override {
-        lcd.line(1).cursor(6) << lamps_qty << next_line;
+        lcd.line(1).cursor(5) << lamps_qty << next_line;
         if (exist.temp_sensor) {
             lcd.line(3) << "t ";
             lcd.width(2) << temperatura << "C  ";
         }
+
+        lcd.line(1).cursor(8) << "Режим:" << ::mode[mode];
         
-        lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");
+        lcd.line(3).cursor(7)  << (flags.uv_on ? "УФ" : "  ");
         if (exist.uv_sensor) {
             if (flags.uv_on)
                 lcd.cursor(10).width(3) << uv_level << "%";
@@ -150,9 +156,9 @@ struct Main_screen : Screen {
                 lcd.cursor(10) << "    ";
         }
 
-        lcd.cursor(16) << (flags.us_on ? "УЗ" : "  ");
+        lcd.line(3).cursor(16) << (flags.us_on ? "УЗ" : "  ");
 
-        lcd.line(2).cursor(8);
+        lcd.line(2).cursor(7);
         if (not flags.is_alarm() ) {
             lcd << "нет" << next_line;
             return;
@@ -169,7 +175,7 @@ struct Main_screen : Screen {
             lcd << "УРОВЕНЬ" << next_line;
             return;
         }
-        if (flags.flow) {
+        if (flags.not_flow) {
             lcd << "НАСОС" << next_line;
         }
     }

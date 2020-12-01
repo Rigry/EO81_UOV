@@ -219,7 +219,7 @@ int main()
 
     auto& alarm_led = Pin::make<LED3, mcu::PinMode::Output>();
 
-    auto& flow = Pin::make<PUMP, mcu::PinMode::Input>();
+    auto& not_flow = Pin::make<PUMP, mcu::PinMode::Input>();
 
     auto overheat = Hysteresis(temperature, flash.temperature_recovery, flash.max_temperature);
 
@@ -349,12 +349,12 @@ int main()
         if (flash.exist.uv_sensor and uv) {
             set_if_greater (&flash.uv_level_highest, uv_level);
             uv_level_percent = uv_level * 100 / flash.uv_level_highest;
-            work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+            work_flags.uv_low_level = work_flags.uv_on and (uv_level_percent < flash.uv_level_min);
         }
 
         if (flash.automatic) {
-            on_us (not overheat and not flow);
-            on_uv (not overheat and not flow);
+            on_us (not overheat and not not_flow);
+            on_uv (not overheat and not not_flow);
             work_flags.us_started = false;
             work_flags.uv_started = false;
         } else {
@@ -362,7 +362,7 @@ int main()
             on_uv (work_flags.uv_started and not overheat);
         }
 
-        work_flags.flow = not flow;
+        work_flags.not_flow = (work_flags.us_on or work_flags.uv_on) and not_flow;
 
         // TODO пока без расширений
         work_flags.bad_lamps = work_flags.uv_on and modbus_slave.outRegs.bad_lamps[0];

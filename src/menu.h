@@ -59,6 +59,7 @@ struct Menu : TickSubscriber {
         , modbus.quantity.lamps
         , modbus.work_flags
         , flash.exist
+        , flash.automatic
     };
 
     Select_screen<5> main_select {

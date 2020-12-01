@@ -28,10 +28,10 @@ struct Flags {
     bool us_started   : 1;
     bool uv_started   : 1;
     bool bad_lamps    : 1;
-    bool flow         : 1;
+    bool not_flow     : 1;
     bool mode         : 1;
     uint16_t          : 7;
-    bool is_alarm() { return bad_lamps or overheat or uv_low_level; }
+    bool is_alarm() { return bad_lamps or overheat or uv_low_level or not_flow; }
 };
 
 
