@@ -316,7 +316,7 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , "Темп. восстановл."
         , flash.temperature_recovery
-        , Min<uint8_t>{10}, Max<uint8_t>{glob::max_temperature}
+        , Min<uint8_t>{5}, Max<uint8_t>{glob::max_temperature}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
     };
 

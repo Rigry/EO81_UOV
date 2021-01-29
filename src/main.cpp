@@ -105,7 +105,7 @@ int main()
         uint16_t factory_number;         // 3
         uint16_t max_temperature;        // 4
         uint16_t uv_level_min;           // 5
-        uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
+        // uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
         uint16_t uv_level_highest;       // 7
         std::array<uint16_t, glob::max_extantions+1> reset_hours;  // 8
     }__attribute__((packed));
@@ -318,11 +318,11 @@ int main()
                         = modbus_slave.outRegs.uv_level_min
                         = modbus_slave.inRegs.uv_level_min;
                 break;
-                case ADR(qty_uv_lamps):
-                    flash.quantity.lamps 
-                    = modbus_slave.outRegs.quantity.lamps
-                    = modbus_slave.inRegs.qty_uv_lamps;
-                break;
+                // case ADR(qty_uv_lamps):
+                //     flash.quantity.lamps 
+                //     = modbus_slave.outRegs.quantity.lamps
+                //     = modbus_slave.inRegs.qty_uv_lamps;
+                // break;
                 case ADR(uv_level_highest):
                     flash.quantity.lamps 
                     = modbus_slave.outRegs.uv_level_highest
