@@ -36,6 +36,6 @@ struct Flags {
 namespace glob {
     auto constexpr max_lamps       {110};
     auto constexpr max_extantions  {10};
-    auto constexpr password        {208};
+    auto constexpr password        {1207};
     auto constexpr max_temperature {99};
 }

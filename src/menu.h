@@ -231,15 +231,14 @@ struct Menu : TickSubscriber {
     };
 
     int confirm;
-    Select_screen<10> tech_select {
+    Select_screen<9> tech_select {
           lcd, buttons_events
         , Out_callback        { [this]{ change_screen(config_select);           }}
         , Line {"Наименование"       ,[this]{ change_screen(name_set);          }}
         , Line {"Максимум УФ"        ,[this]{ change_screen(max_uv_set);        }}
         , Line {"Сброс максимума УФ" ,[this]{ confirm = 0; 
                                               change_screen(max_uv_reset);      }}
-        , Line {"Кол-во ламп тут"    ,[this]{ change_screen(qty_lamps_set);     }}
-        , Line {"Кол-во расширений"  ,[this]{ change_screen(qty_extentions_set);}}
+        , Line {"Кол-во ламп"        ,[this]{ change_screen(qty_lamps_set);     }}
         , Line {"Макс. температура"  ,[this]{ change_screen(max_temp_set);      }}
         , Line {"Темп. восстановл."  ,[this]{ change_screen(recovery_temp_set); }}
         , Line {"Сброс лога"         ,[this]{
@@ -282,21 +281,9 @@ struct Menu : TickSubscriber {
 
     Set_screen<uint8_t> qty_lamps_set {
           lcd, buttons_events
-        , "Кол-во ламп тут"
+        , "Кол-во ламп"
         , flash.quantity.lamps
-        , Min<uint8_t>{1}, Max<uint8_t>{10}
-        , Out_callback    { [this]{ change_screen(tech_select);  }}
-        , Enter_callback  { [this]{
-            modbus.quantity = flash.quantity;
-            change_screen(tech_select);
-        }}
-    };
-
-    Set_screen<uint8_t> qty_extentions_set {
-          lcd, buttons_events
-        , "Кол-во расширений"
-        , flash.quantity.extantions
-        , Min<uint8_t>{0}, Max<uint8_t>{glob::max_extantions}
+        , Min<uint8_t>{1}, Max<uint8_t>{16}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , Enter_callback  { [this]{
             modbus.quantity = flash.quantity;
