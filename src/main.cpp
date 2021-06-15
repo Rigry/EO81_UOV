@@ -71,6 +71,14 @@ int main()
             .baudrate       = USART::Baudrate::BR9600,
             .res            = 0
         };
+        UART::Settings uart_set_master = {
+            .parity_enable  = false,
+            .parity         = USART::Parity::even,
+            .data_bits      = USART::DataBits::_8,
+            .stop_bits      = USART::StopBits::_1,
+            .baudrate       = USART::Baudrate::BR9600,
+            .res            = 0
+        };
         uint8_t  modbus_address        = 1;
         uint8_t  max_temperature       = 55;
         uint8_t  uv_level_min          = 40;
@@ -150,7 +158,7 @@ int main()
         , TX_master
         , RX_master
         , RTS_master
-    > (100_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
+    > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
     // подсчёт часов работы
     auto work_count = Work_count{
