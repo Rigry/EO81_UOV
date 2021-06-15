@@ -145,31 +145,12 @@ int main()
     >(flash.modbus_address, flash.uart_set);
 
     struct {
-        // TODO пока без модулей расширения
-        // Register<1,  Modbus_function::read_03, 0> qty_lamps_1;
-        // Register<2,  Modbus_function::read_03, 0> qty_lamps_2;
-        // Register<3,  Modbus_function::read_03, 0> qty_lamps_3;
-        // Register<4,  Modbus_function::read_03, 0> qty_lamps_4;
-        // Register<5,  Modbus_function::read_03, 0> qty_lamps_5;
-        // Register<6,  Modbus_function::read_03, 0> qty_lamps_6;
-        // Register<7,  Modbus_function::read_03, 0> qty_lamps_7;
-        // Register<8,  Modbus_function::read_03, 0> qty_lamps_8;
-        // Register<9,  Modbus_function::read_03, 0> qty_lamps_9;
-        // Register<10, Modbus_function::read_03, 0> qty_lamps_10;
-
-        // Register<1,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_1;
-        // Register<2,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_2;
-        // Register<3,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_3;
-        // Register<4,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_4;
-        // Register<5,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_5;
-        // Register<6,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_6;
-        // Register<7,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_7;
-        // Register<8,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_8;
-        // Register<9,  Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_9;
-        // Register<10, Modbus_function::read_03, 1, Bit_set<10>> bad_lamps_10;
-
         Register<10, Modbus_function::read_03, 0> uv_level;
         Register<10, Modbus_function::read_03, 1> temperature;
+
+        Register<11, Modbus_function::read_03, 9> lamp_hours;
+        Register<11, Modbus_function::read_03, 10> lamp_mins;
+        Register<11, Modbus_function::read_03, 12> sec_to_start;
     } modbus_master_regs;
 
     decltype(auto) volatile modbus_master = make_modbus_master <
