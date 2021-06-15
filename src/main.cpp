@@ -147,10 +147,6 @@ int main()
     struct {
         Register<10, Modbus_function::read_03, 0> uv_level;
         Register<10, Modbus_function::read_03, 1> temperature;
-
-        Register<11, Modbus_function::read_03, 9> lamp_hours;
-        Register<11, Modbus_function::read_03, 10> lamp_mins;
-        Register<11, Modbus_function::read_03, 12> sec_to_start;
     } modbus_master_regs;
 
     decltype(auto) volatile modbus_master = make_modbus_master <
