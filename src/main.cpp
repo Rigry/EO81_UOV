@@ -71,6 +71,14 @@ int main()
             .baudrate       = USART::Baudrate::BR9600,
             .res            = 0
         };
+        UART::Settings uart_set_master = {
+            .parity_enable  = false,
+            .parity         = USART::Parity::even,
+            .data_bits      = USART::DataBits::_8,
+            .stop_bits      = USART::StopBits::_1,
+            .baudrate       = USART::Baudrate::BR9600,
+            .res            = 0
+        };
         uint8_t  modbus_address        = 1;
         uint8_t  max_temperature       = 55;
         uint8_t  uv_level_min          = 40;
@@ -105,7 +113,7 @@ int main()
         uint16_t factory_number;         // 3
         uint16_t max_temperature;        // 4
         uint16_t uv_level_min;           // 5
-        // uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
+        uint16_t qty_uv_lamps;           // 6 // FIX убрать для редактирования
         uint16_t uv_level_highest;       // 7
         std::array<uint16_t, glob::max_extantions+1> reset_hours;  // 8
     }__attribute__((packed));
@@ -164,12 +172,12 @@ int main()
         Register<10, Modbus_function::read_03, 1> temperature;
     } modbus_master_regs;
 
-    decltype(auto) modbus_master = make_modbus_master <
+    decltype(auto) volatile modbus_master = make_modbus_master <
           mcu::Periph::USART3
         , TX_master
         , RX_master
         , RTS_master
-    > (100_ms, flash.uart_set, modbus_master_regs); // FIX flash.uart_set placeholder
+    > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
     // подсчёт часов работы
     auto work_count = Work_count{
