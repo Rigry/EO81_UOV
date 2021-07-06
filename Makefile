@@ -11,13 +11,15 @@ GIT_VERSION := "$(shell git describe --always --tags)"
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
 LIBRARY_PATH = mculib3
+BOOST_ROOT = /usr/include/
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s
 LDSCRIPT_F1 = $(LIBRARY_PATH)/STM32F1_files/STM32F103RBTx_FLASH.ld
 
 # C includes
-C_INCLUDES =  
+C_INCLUDES =
 C_INCLUDES += -I./src
+
 C_INCLUDES += -I$(LIBRARY_PATH)/STM32F1_files
 C_INCLUDES += -I$(LIBRARY_PATH)/STM32F1_files/CMSIS
 C_INCLUDES += -I$(LIBRARY_PATH)/src
@@ -25,6 +27,9 @@ C_INCLUDES += -I$(LIBRARY_PATH)/src/periph
 C_INCLUDES += -I$(LIBRARY_PATH)/src/bits
 C_INCLUDES += -I$(LIBRARY_PATH)/src/middleware
 C_INCLUDES += -I$(LIBRARY_PATH)/magic_get/include
+C_INCLUDES += -I$(BOOST_ROOT)
+C_INCLUDES += -I$(BOOST_ROOT)/stage/lib64
+
 
 
 #######################################

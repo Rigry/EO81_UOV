@@ -18,6 +18,7 @@
 #include "safe_flash.h"
 #include "lamps.h"
 #include "work_count.h"
+// #include <boost/preprocessor/iteration/local.hpp>
 
 
 /// эта функция вызывается первой в startup файле
@@ -148,9 +149,18 @@ int main()
         Register<10, Modbus_function::read_03, 0> uv_level;
         Register<10, Modbus_function::read_03, 1> temperature;
 
+        // #define  BOOST_PP_LOCAL_MACRO(i) /
         Register<11, Modbus_function::read_03, 9> lamp_hours;
         Register<11, Modbus_function::read_03, 10> lamp_mins;
         Register<11, Modbus_function::read_03, 12> sec_to_start;
+
+        Register<11, Modbus_function::write_16, 0> on_off;
+        Register<11, Modbus_function::write_16, 1> set_power;
+        Register<11, Modbus_function::write_16, 23> set_sec_to_start;
+        // #define  BOOST_PP_LOCAL_LIMITS (11, 16)
+        // #include BOOST_PP_LOCAL_ITERATE()
+
+        
     } modbus_master_regs;
 
     decltype(auto) modbus_master = make_modbus_master <
@@ -161,16 +171,16 @@ int main()
     > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
     // подсчёт часов работы
-    auto work_count = Work_count{
-          modbus_slave.outRegs.bad_lamps[0]
-        , modbus_slave.outRegs.hours
-        , flash.quantity.lamps
-    };
+    // auto work_count = Work_count{
+    //       modbus_slave.outRegs.bad_lamps[0]
+    //     , modbus_slave.outRegs.hours
+    //     , flash.quantity.lamps
+    // };
 
-    [[maybe_unused]] auto __ = Safe_flash_updater<
-          mcu::FLASH::Sector::_89
-        , mcu::FLASH::Sector::_115
-    >::make (work_count.get_data());
+    // [[maybe_unused]] auto __ = Safe_flash_updater<
+    //       mcu::FLASH::Sector::_89
+    //     , mcu::FLASH::Sector::_115
+    // >::make (work_count.get_data());
 
     #define ADR(reg) GET_ADR(In_regs, reg)
     modbus_slave.outRegs.device_code       = 8;
@@ -178,8 +188,8 @@ int main()
     modbus_slave.outRegs.uart_set          = flash.uart_set;
     modbus_slave.outRegs.modbus_address    = flash.modbus_address;
     modbus_slave.outRegs.quantity          = flash.quantity;
-    for (auto i{0}; i < 10; i++)
-        modbus_slave.outRegs.hours[i] = work_count.get_hours(i);
+    // for (auto i{0}; i < 10; i++)
+    //     modbus_slave.outRegs.hours[i] = work_count.get_hours(i);
     modbus_slave.arInRegsMax[ADR(uart_set)]= 0x0F;
     modbus_slave.inRegsMin.modbus_address  = 1;
     modbus_slave.inRegsMax.modbus_address  = 255;
@@ -195,7 +205,7 @@ int main()
         hd44780_pins, up, down, enter
         , flash
         , modbus_slave.outRegs
-        , work_count
+        // , work_count
     );
 
 

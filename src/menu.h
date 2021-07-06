@@ -19,7 +19,7 @@ struct Menu : TickSubscriber {
     Button_event& enter;
     Flash_data&   flash;
     Modbus_regs&  modbus;
-    Work_count&   work_count;
+    // Work_count&   work_count;
 
     Screen* current_screen {&main_screen};
     size_t tick_count{0};
@@ -41,9 +41,9 @@ struct Menu : TickSubscriber {
         , Button_event& enter
         , Flash_data&   flash
         , Modbus_regs&  modbus
-        , Work_count&   work_count
+        // , Work_count&   work_count
     ) : up{up}, down{down}, enter{enter}
-      , flash{flash}, modbus{modbus}, work_count{work_count}
+      , flash{flash}, modbus{modbus}
     {
         tick_subscribe();
         current_screen->init();
