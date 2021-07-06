@@ -228,10 +228,10 @@ int main()
     auto on_uv = [&](bool on = true){
         if (on and not uv) {
             flash.count.on++;
-            work_count.start();
+            // work_count.start();
         }
         if (not on and uv)
-            work_count.stop();
+            // work_count.stop();
         uv = uv_led = work_flags.uv_on = on;
     };
 
@@ -328,7 +328,7 @@ int main()
                     = modbus_slave.inRegs.uv_level_highest;
                 break;
                 case ADR(reset_hours): // TODO без плат расширения
-                work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
+                // work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
                 break;
             } // switch
         });

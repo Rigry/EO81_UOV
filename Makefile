@@ -27,8 +27,8 @@ C_INCLUDES += -I$(LIBRARY_PATH)/src/periph
 C_INCLUDES += -I$(LIBRARY_PATH)/src/bits
 C_INCLUDES += -I$(LIBRARY_PATH)/src/middleware
 C_INCLUDES += -I$(LIBRARY_PATH)/magic_get/include
-C_INCLUDES += -I$(BOOST_ROOT)
-C_INCLUDES += -I$(BOOST_ROOT)/stage/lib64
+# C_INCLUDES += -I$(BOOST_ROOT)
+# C_INCLUDES += -I$(BOOST_ROOT)/stage/lib64
 
 
 

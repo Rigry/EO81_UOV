@@ -89,7 +89,7 @@ struct Menu : TickSubscriber {
         , Out_callback             { [this]{ change_screen(main_select);  }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс всех ламп   ",[this]{
-            work_count.reset();
+            // work_count.reset();
             flash.count.reset_all++;
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
@@ -114,7 +114,7 @@ struct Menu : TickSubscriber {
         , Min<int>{1}, Max<int>{1}
         , Out_callback      { [this]{ change_screen(work_select);  }}
         , Enter_callback    { [this]{
-            work_count.reset(reset_n-1);
+            // work_count.reset(reset_n-1);
             flash.count.reset_one++;
             work_time_screen.set_first_lamp(reset_n-1);
             change_screen(work_time_screen);
