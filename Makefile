@@ -10,7 +10,7 @@ GIT_VERSION := "$(shell git describe --always --tags)"
 # source
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
-LIBRARY_PATH = mculib3
+LIBRARY_PATH = ../mculib3
 BOOST_ROOT = /usr/include/
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s

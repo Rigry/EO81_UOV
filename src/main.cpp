@@ -17,9 +17,8 @@
 #include "flash.h"
 #include "safe_flash.h"
 #include "lamps.h"
-#include "work_count.h"
-// #include <boost/preprocessor/iteration/local.hpp>
-
+// #include "work_count.h"
+#include <array>
 
 /// эта функция вызывается первой в startup файле
 extern "C" void init_clock() { init_clock<F_OSC, F_CPU>(); }
@@ -146,22 +145,53 @@ int main()
     >(flash.modbus_address, flash.uart_set);
 
     struct {
+
         Register<10, Modbus_function::read_03, 0> uv_level;
         Register<10, Modbus_function::read_03, 1> temperature;
 
-        // #define  BOOST_PP_LOCAL_MACRO(i) /
-        Register<11, Modbus_function::read_03, 9> lamp_hours;
-        Register<11, Modbus_function::read_03, 10> lamp_mins;
-        Register<11, Modbus_function::read_03, 12> sec_to_start;
+        Register<11, Modbus_function::read_04, 6> state_lamp_1;
+        Register<12, Modbus_function::read_04, 6> state_lamp_2;
+        Register<13, Modbus_function::read_04, 6> state_lamp_3;
+        Register<14, Modbus_function::read_04, 6> state_lamp_4;
+        Register<15, Modbus_function::read_04, 6> state_lamp_5;
+        Register<16, Modbus_function::read_04, 6> state_lamp_6;
+        
+        Register<11, Modbus_function::read_04, 9> lamp_hours_1;
+        Register<12, Modbus_function::read_04, 9> lamp_hours_2;
+        Register<13, Modbus_function::read_04, 9> lamp_hours_3;
+        Register<14, Modbus_function::read_04, 9> lamp_hours_4;
+        Register<15, Modbus_function::read_04, 9> lamp_hours_5;
+        Register<16, Modbus_function::read_04, 9> lamp_hours_6;
+        
+        Register<11, Modbus_function::write_16, 0> on_off_1;
+        Register<12, Modbus_function::write_16, 0> on_off_2;
+        Register<13, Modbus_function::write_16, 0> on_off_3;
+        Register<14, Modbus_function::write_16, 0> on_off_4;
+        Register<15, Modbus_function::write_16, 0> on_off_5;
+        Register<16, Modbus_function::write_16, 0> on_off_6;
 
-        Register<11, Modbus_function::write_16, 0> on_off;
-        Register<11, Modbus_function::write_16, 1> set_power;
-        Register<11, Modbus_function::write_16, 23> set_sec_to_start;
-        // #define  BOOST_PP_LOCAL_LIMITS (11, 16)
-        // #include BOOST_PP_LOCAL_ITERATE()
 
+        // Register<11, Modbus_function::read_03, 24> sec_to_start;
+        // Register<11, Modbus_function::read_03, 23> power;
+
+        // Register<11, Modbus_function::write_16, 23> set_power;
+        // Register<11, Modbus_function::write_16, 24> set_sec_to_start;
+
+        // Register<11, Modbus_function::write_16, 13> service;
+        // Register<11, Modbus_function::write_16, 14> save_setting;
         
     } modbus_master_regs;
+
+    // modbus_master_regs.temperature.disable = true;
+    // modbus_master_regs.uv_level.disable = true;  
+
+    // modbus_master_regs.sec_to_start.disable = true;
+    // modbus_master_regs.power.disable = true;
+    
+    // modbus_master_regs.set_power.disable = true;
+    // modbus_master_regs.set_sec_to_start.disable = true;
+    // modbus_master_regs.service.disable = true;
+    // modbus_master_regs.save_setting.disable = true;
 
     decltype(auto) modbus_master = make_modbus_master <
           mcu::Periph::USART3
@@ -169,18 +199,6 @@ int main()
         , RX_master
         , RTS_master
     > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
-
-    // подсчёт часов работы
-    // auto work_count = Work_count{
-    //       modbus_slave.outRegs.bad_lamps[0]
-    //     , modbus_slave.outRegs.hours
-    //     , flash.quantity.lamps
-    // };
-
-    // [[maybe_unused]] auto __ = Safe_flash_updater<
-    //       mcu::FLASH::Sector::_89
-    //     , mcu::FLASH::Sector::_115
-    // >::make (work_count.get_data());
 
     #define ADR(reg) GET_ADR(In_regs, reg)
     modbus_slave.outRegs.device_code       = 8;
@@ -205,9 +223,8 @@ int main()
         hd44780_pins, up, down, enter
         , flash
         , modbus_slave.outRegs
-        // , work_count
+        , modbus_master_regs
     );
-
 
     // алиасы
     auto& temperature = (uint16_t&)modbus_master_regs.temperature;
@@ -226,13 +243,16 @@ int main()
     auto  uv_button = Button<UV_BTN>();
 
     auto on_uv = [&](bool on = true){
-        if (on and not uv) {
+        if (on and not uv) 
             flash.count.on++;
-            // work_count.start();
-        }
-        if (not on and uv)
-            // work_count.stop();
+        
         uv = uv_led = work_flags.uv_on = on;
+        modbus_master_regs.on_off_1 = on;
+        modbus_master_regs.on_off_2 = on;
+        modbus_master_regs.on_off_3 = on;
+        modbus_master_regs.on_off_4 = on;
+        modbus_master_regs.on_off_5 = on;
+        modbus_master_regs.on_off_6 = on;
     };
 
     uv_button.set_down_callback([&]{
@@ -275,12 +295,18 @@ int main()
     };
 
     // Определение плохих ламп
-    Lamps::make<
-        EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
-    >(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
+    Lamps::make(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
 
 
     while (1) {
+
+        modbus_slave.outRegs.hours[0] = modbus_master_regs.lamp_hours_1;
+        modbus_slave.outRegs.hours[1] = modbus_master_regs.lamp_hours_2;
+        modbus_slave.outRegs.hours[2] = modbus_master_regs.lamp_hours_3;
+        modbus_slave.outRegs.hours[3] = modbus_master_regs.lamp_hours_4;
+        modbus_slave.outRegs.hours[4] = modbus_master_regs.lamp_hours_5;
+        modbus_slave.outRegs.hours[5] = modbus_master_regs.lamp_hours_6;
+
         modbus_master();
         modbus_slave([&](auto registr){
             static bool unblock = false;
@@ -331,7 +357,8 @@ int main()
                 // work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
                 break;
             } // switch
-        });
+        }, [&](auto registr){}
+        );
 
         overheat.set_min(flash.temperature_recovery);
         overheat.set_max(flash.max_temperature);

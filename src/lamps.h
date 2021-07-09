@@ -27,15 +27,10 @@ auto from_tuple(T in) {
 
 class Lamps : TickSubscriber {
 public:
-    template<class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8, class P9, class P10>
     static Lamps& make(uint16_t& bad_lamps, uint8_t& lamps_qty)
     {
-        auto pins = make_pins<
-            mcu::PinMode::Input,
-            P1,P2,P3,P4,P5,P6,P7,P8,P9,P10
-        >();
         static auto result = Lamps{
-              from_tuple(pins)
+              from_tuple()
             , bad_lamps
             , lamps_qty
         };
@@ -44,15 +39,13 @@ public:
 
 
 private:
-    const std::array<Pin*, 10> pins;
     uint16_t& bad_lamps;
     const uint8_t& lamps_qty;
 
     Lamps(
-          std::array<Pin*, 10> pins
-        , uint16_t& bad_lamps
+          uint16_t& bad_lamps
         , uint8_t& lamps_qty
-    ) : pins {pins}, bad_lamps {bad_lamps}, lamps_qty{lamps_qty}
+    ) : bad_lamps {bad_lamps}, lamps_qty{lamps_qty}
     {
         tick_subscribe();
     }
@@ -62,7 +55,7 @@ private:
         uint16_t tmp{0};
         // TODO сюда бы пинлист из 2-ой библиотеки
         for (auto i{0}; i < lamps_qty; i++) {
-            tmp |= *pins[i] << i;
+            tmp |= *[i] << i;
         }
         bad_lamps = tmp;
     }

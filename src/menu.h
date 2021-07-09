@@ -10,7 +10,7 @@
 
 
 
-template<class Pins, class Flash_data, class Modbus_regs>
+template<class Pins, class Flash_data, class Modbus_regs, class Regs>
 struct Menu : TickSubscriber {
     String_buffer lcd {};
     HD44780& hd44780 { HD44780::make(Pins{}, lcd.get_buffer()) };
@@ -19,7 +19,7 @@ struct Menu : TickSubscriber {
     Button_event& enter;
     Flash_data&   flash;
     Modbus_regs&  modbus;
-    // Work_count&   work_count;
+    Regs& modbus_master_regs;
 
     Screen* current_screen {&main_screen};
     size_t tick_count{0};
@@ -41,9 +41,9 @@ struct Menu : TickSubscriber {
         , Button_event& enter
         , Flash_data&   flash
         , Modbus_regs&  modbus
-        // , Work_count&   work_count
+        , Regs& modbus_master_regs
     ) : up{up}, down{down}, enter{enter}
-      , flash{flash}, modbus{modbus}
+      , flash{flash}, modbus{modbus}, modbus_master_regs{modbus_master_regs}
     {
         tick_subscribe();
         current_screen->init();
@@ -233,12 +233,19 @@ struct Menu : TickSubscriber {
     int confirm;
     Select_screen<9> tech_select {
           lcd, buttons_events
-        , Out_callback        { [this]{ change_screen(config_select);           }}
+        , Out_callback        { [this]{ /*modbus_master_regs.save_setting.disable = true;
+                                        modbus_master_regs.service.disable = true;*/
+                                        change_screen(config_select);}}
         , Line {"Наименование"       ,[this]{ change_screen(name_set);          }}
         , Line {"Максимум УФ"        ,[this]{ change_screen(max_uv_set);        }}
         , Line {"Сброс максимума УФ" ,[this]{ confirm = 0; 
                                               change_screen(max_uv_reset);      }}
         , Line {"Кол-во ламп"        ,[this]{ change_screen(qty_lamps_set);     }}
+        // , Line {"Параметры ламп"     ,[this]{ modbus_master_regs.power.disable = false;
+        //                                       modbus_master_regs.sec_to_start.disable = false;
+        //                                       modbus_master_regs.service = SERVICE_CODE;
+        //                                       modbus_master_regs.service.disable = false;
+        //                                       change_screen(parameter_lamps); }}
         , Line {"Макс. температура"  ,[this]{ change_screen(max_temp_set);      }}
         , Line {"Темп. восстановл."  ,[this]{ change_screen(recovery_temp_set); }}
         , Line {"Сброс лога"         ,[this]{
@@ -290,6 +297,56 @@ struct Menu : TickSubscriber {
             change_screen(tech_select);
         }}
     };
+
+// void save() {
+//     modbus_master_regs.save_setting = SAVE_SYSTEM_SETTING_CODE;
+//     modbus_master_regs.save_setting.disable = false;
+// }
+
+    // uint16_t lamp_power{450};
+    // uint16_t time {3};
+    // Select_screen<2> parameter_lamps {
+    //       lcd, buttons_events
+    //     , Out_callback        { [this]{ modbus_master_regs.set_power.disable = true;
+    //                                     modbus_master_regs.set_sec_to_start.disable = true;
+    //                                     modbus_master_regs.power.disable = true;
+    //                                     modbus_master_regs.sec_to_start.disable = true;
+    //                                     modbus_master_regs.service = SERVICE_OUT;
+    //                                     modbus_master_regs.service.disable = false;
+    //                                     change_screen(tech_select);}}
+    //     , Line {"Мощность лампы"     ,[this]{ lamp_power = modbus_master_regs.power; change_screen(power);          }}
+    //     , Line {"Время до запуска"   ,[this]{ time = modbus_master_regs.sec_to_start; change_screen(time_to_start);  }}
+    // };
+
+    // Set_screen<uint16_t> power {
+    //       lcd, buttons_events
+    //     , "Мощность лампы в Вт"
+    //     , lamp_power
+    //     , Min<uint16_t>{450}, Max<uint16_t>{800}
+    //     , Out_callback { [this]{ 
+    //         change_screen(parameter_lamps); }}
+    //     , Enter_callback { [this]{
+    //         modbus_master_regs.set_power = lamp_power;
+    //         modbus_master_regs.set_power.disable = false;
+    //         save();
+    //         change_screen(parameter_lamps);
+    //     ;}}
+    // };
+
+    // Set_screen<uint16_t> time_to_start {
+    //       lcd, buttons_events
+    //     , "Время до старта сек"
+    //     , time
+    //     , Min<uint16_t>{3}, Max<uint16_t>{255}
+    //     , Out_callback { [this]{ 
+    //         change_screen(parameter_lamps);}}
+    //     , Enter_callback { [this]{
+    //         modbus_master_regs.set_sec_to_start = time;
+    //         modbus_master_regs.set_sec_to_start.disable = false;
+    //         save();
+    //         change_screen(parameter_lamps);
+    //     ;}}
+    // };
 
     Set_screen<uint8_t> max_temp_set {
           lcd, buttons_events

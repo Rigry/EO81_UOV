@@ -39,3 +39,8 @@ namespace glob {
     auto constexpr password        {1207};
     auto constexpr max_temperature {99};
 }
+
+#define SERVICE_CODE 30345
+#define SERVICE_OUT 0
+#define SAVE_SYSTEM_SETTING_CODE 22136
+#define RESET_LAMP_RESOURCE_CODE 22357
