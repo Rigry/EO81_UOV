@@ -84,16 +84,21 @@ struct Menu : TickSubscriber {
         , modbus.bad_lamps, modbus.quantity.lamps, modbus.work_flags
     };
 
-    Select_screen<3> work_select {
+    Select_screen<2> work_select {
           lcd, buttons_events
-        , Out_callback             { [this]{ change_screen(main_select);  }}
+        , Out_callback             { [this]{ change_screen(main_select);  
+                                        modbus_master_regs.save_setting.disable = true;
+                                        modbus_master_regs.service.disable = true;
+                                        modbus_master_regs.reset_resource_1.disable = true;
+                                        modbus_master_regs.reset_resource_2.disable = true;
+                                        modbus_master_regs.reset_resource_3.disable = true;
+                                        modbus_master_regs.reset_resource_4.disable = true;
+                                        modbus_master_regs.reset_resource_5.disable = true;
+                                        modbus_master_regs.reset_resource_6.disable = true; }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
-        , Line {"Сброс всех ламп   ",[this]{
-            // work_count.reset();
-            flash.count.reset_all++;
-            change_screen(work_time_screen); // чтоб увидеть действие
-        }}
-        , Line {"Сброс одной лампы",[this]{ 
+        , Line {"Сброс ресурса лампы",[this]{
+            modbus_master_regs.service = SERVICE_CODE;
+            modbus_master_regs.service.disable = false;
             reset_n_set.max = modbus.quantity.lamps;
             change_screen(reset_n_set);
         }}
@@ -106,6 +111,11 @@ struct Menu : TickSubscriber {
         , modbus.hours, modbus.quantity.lamps
     };
 
+    void save() {
+        modbus_master_regs.save_setting = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting.disable = false;
+    }
+
     int reset_n {1};
     Set_screen<int> reset_n_set {
           lcd, buttons_events
@@ -114,9 +124,27 @@ struct Menu : TickSubscriber {
         , Min<int>{1}, Max<int>{1}
         , Out_callback      { [this]{ change_screen(work_select);  }}
         , Enter_callback    { [this]{
-            // work_count.reset(reset_n-1);
             flash.count.reset_one++;
-            work_time_screen.set_first_lamp(reset_n-1);
+            if (reset_n == 1) {
+                modbus_master_regs.reset_resource_1 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_1.disable = false;
+            } else if (reset_n == 2) {
+                modbus_master_regs.reset_resource_2 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_2.disable = false;
+            } else if (reset_n == 3) {
+                modbus_master_regs.reset_resource_3 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_3.disable = false;
+            } else if (reset_n == 4) {
+                modbus_master_regs.reset_resource_4 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_4.disable = false;
+            } else if (reset_n == 5) {
+                modbus_master_regs.reset_resource_5 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_5.disable = false;
+            } else {
+                modbus_master_regs.reset_resource_6 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_6.disable = false;
+            }
+            save();
             change_screen(work_time_screen);
         }}
     };
@@ -297,11 +325,6 @@ struct Menu : TickSubscriber {
             change_screen(tech_select);
         }}
     };
-
-// void save() {
-//     modbus_master_regs.save_setting = SAVE_SYSTEM_SETTING_CODE;
-//     modbus_master_regs.save_setting.disable = false;
-// }
 
     // uint16_t lamp_power{450};
     // uint16_t time {3};

@@ -150,13 +150,14 @@ int main()
         Register<10, Modbus_function::read_03, 1> temperature;
 
         Register<11, Modbus_function::read_04, 6> state_lamp_1;
+        // Register<11, Modbus_function::read_04, 4> error_lamp_1;
         Register<12, Modbus_function::read_04, 6> state_lamp_2;
         Register<13, Modbus_function::read_04, 6> state_lamp_3;
         Register<14, Modbus_function::read_04, 6> state_lamp_4;
         Register<15, Modbus_function::read_04, 6> state_lamp_5;
         Register<16, Modbus_function::read_04, 6> state_lamp_6;
         
-        Register<11, Modbus_function::read_04, 9> lamp_hours_1;
+        Register<11, Modbus_function::read_04, 10> lamp_hours_1;
         Register<12, Modbus_function::read_04, 9> lamp_hours_2;
         Register<13, Modbus_function::read_04, 9> lamp_hours_3;
         Register<14, Modbus_function::read_04, 9> lamp_hours_4;
@@ -170,6 +171,13 @@ int main()
         Register<15, Modbus_function::write_16, 0> on_off_5;
         Register<16, Modbus_function::write_16, 0> on_off_6;
 
+        Register<11, Modbus_function::write_16, 15> reset_resource_1;
+        Register<12, Modbus_function::write_16, 15> reset_resource_2;
+        Register<13, Modbus_function::write_16, 15> reset_resource_3;
+        Register<14, Modbus_function::write_16, 15> reset_resource_4;
+        Register<15, Modbus_function::write_16, 15> reset_resource_5;
+        Register<16, Modbus_function::write_16, 15> reset_resource_6;
+
 
         // Register<11, Modbus_function::read_03, 24> sec_to_start;
         // Register<11, Modbus_function::read_03, 23> power;
@@ -177,21 +185,20 @@ int main()
         // Register<11, Modbus_function::write_16, 23> set_power;
         // Register<11, Modbus_function::write_16, 24> set_sec_to_start;
 
-        // Register<11, Modbus_function::write_16, 13> service;
-        // Register<11, Modbus_function::write_16, 14> save_setting;
+        Register<11, Modbus_function::write_16, 13> service;
+        Register<11, Modbus_function::write_16, 14> save_setting;
         
-    } modbus_master_regs;
+    } modbus_master_regs; 
 
-    // modbus_master_regs.temperature.disable = true;
-    // modbus_master_regs.uv_level.disable = true;  
-
-    // modbus_master_regs.sec_to_start.disable = true;
-    // modbus_master_regs.power.disable = true;
+    modbus_master_regs.reset_resource_1.disable = true;
+    modbus_master_regs.reset_resource_2.disable = true;
+    modbus_master_regs.reset_resource_3.disable = true;
+    modbus_master_regs.reset_resource_4.disable = true;
+    modbus_master_regs.reset_resource_5.disable = true;
+    modbus_master_regs.reset_resource_6.disable = true;
     
-    // modbus_master_regs.set_power.disable = true;
-    // modbus_master_regs.set_sec_to_start.disable = true;
-    // modbus_master_regs.service.disable = true;
-    // modbus_master_regs.save_setting.disable = true;
+    modbus_master_regs.service.disable = true;
+    modbus_master_regs.save_setting.disable = true;
 
     decltype(auto) modbus_master = make_modbus_master <
           mcu::Periph::USART3
@@ -294,8 +301,10 @@ int main()
             work_flags.uv_started = false;
     };
 
+    std::array<bool, 6> state_lamps{false};
+
     // Определение плохих ламп
-    Lamps::make(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
+    Lamps::make(state_lamps, modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
 
 
     while (1) {
@@ -306,6 +315,13 @@ int main()
         modbus_slave.outRegs.hours[3] = modbus_master_regs.lamp_hours_4;
         modbus_slave.outRegs.hours[4] = modbus_master_regs.lamp_hours_5;
         modbus_slave.outRegs.hours[5] = modbus_master_regs.lamp_hours_6;
+
+        state_lamps[0] = modbus_master_regs.state_lamp_1 != 7; // код рабочего состояния лампы
+        state_lamps[1] = modbus_master_regs.state_lamp_2 != 7;
+        state_lamps[2] = modbus_master_regs.state_lamp_3 != 7;
+        state_lamps[3] = modbus_master_regs.state_lamp_4 != 7;
+        state_lamps[4] = modbus_master_regs.state_lamp_5 != 7;
+        state_lamps[5] = modbus_master_regs.state_lamp_6 != 7;
 
         modbus_master();
         modbus_slave([&](auto registr){
