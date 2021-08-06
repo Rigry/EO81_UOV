@@ -8,7 +8,7 @@
 
 class Lamps : TickSubscriber {
 public:
-    static Lamps& make(std::array<bool, 6>& state_lamps, uint16_t& bad_lamps, uint8_t& lamps_qty)
+    static Lamps& make(std::array<bool, 9>& state_lamps, uint16_t& bad_lamps, uint8_t& lamps_qty)
     {
         static auto result = Lamps{
               state_lamps
@@ -20,12 +20,12 @@ public:
 
 
 private:
-    const std::array<bool, 6>& state_lamps;
+    const std::array<bool, 9>& state_lamps;
     uint16_t& bad_lamps;
     const uint8_t& lamps_qty;
 
     Lamps(
-          std::array<bool, 6>& state_lamps
+          std::array<bool, 9>& state_lamps
         , uint16_t& bad_lamps
         , uint8_t& lamps_qty
     ) : state_lamps {state_lamps}, bad_lamps {bad_lamps}, lamps_qty{lamps_qty}

@@ -87,18 +87,54 @@ struct Menu : TickSubscriber {
     Select_screen<2> work_select {
           lcd, buttons_events
         , Out_callback             { [this]{ change_screen(main_select);  
-                                        modbus_master_regs.save_setting.disable = true;
-                                        modbus_master_regs.service.disable = true;
+                                        modbus_master_regs.save_setting_1.disable = true;
+                                        modbus_master_regs.service_1.disable = true;
+                                        modbus_master_regs.save_setting_2.disable = true;
+                                        modbus_master_regs.service_2.disable = true;
+                                        modbus_master_regs.save_setting_3.disable = true;
+                                        modbus_master_regs.service_3.disable = true;
+                                        modbus_master_regs.save_setting_4.disable = true;
+                                        modbus_master_regs.service_4.disable = true;
+                                        modbus_master_regs.save_setting_5.disable = true;
+                                        modbus_master_regs.service_5.disable = true;
+                                        modbus_master_regs.save_setting_6.disable = true;
+                                        modbus_master_regs.service_6.disable = true;
+                                        modbus_master_regs.save_setting_7.disable = true;
+                                        modbus_master_regs.service_7.disable = true;
+                                        modbus_master_regs.save_setting_8.disable = true;
+                                        modbus_master_regs.service_8.disable = true;
+                                        modbus_master_regs.save_setting_9.disable = true;
+                                        modbus_master_regs.service_9.disable = true;
+
                                         modbus_master_regs.reset_resource_1.disable = true;
                                         modbus_master_regs.reset_resource_2.disable = true;
                                         modbus_master_regs.reset_resource_3.disable = true;
                                         modbus_master_regs.reset_resource_4.disable = true;
                                         modbus_master_regs.reset_resource_5.disable = true;
-                                        modbus_master_regs.reset_resource_6.disable = true; }}
+                                        modbus_master_regs.reset_resource_6.disable = true;
+                                        modbus_master_regs.reset_resource_7.disable = true;
+                                        modbus_master_regs.reset_resource_8.disable = true;
+                                        modbus_master_regs.reset_resource_9.disable = true; }}
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс ресурса лампы",[this]{
-            modbus_master_regs.service = SERVICE_CODE;
-            modbus_master_regs.service.disable = false;
+            modbus_master_regs.service_1 = SERVICE_CODE;
+            modbus_master_regs.service_1.disable = false;
+            modbus_master_regs.service_2 = SERVICE_CODE;
+            modbus_master_regs.service_2.disable = false;
+            modbus_master_regs.service_3 = SERVICE_CODE;
+            modbus_master_regs.service_3.disable = false;
+            modbus_master_regs.service_4 = SERVICE_CODE;
+            modbus_master_regs.service_4.disable = false;
+            modbus_master_regs.service_5 = SERVICE_CODE;
+            modbus_master_regs.service_5.disable = false;
+            modbus_master_regs.service_6 = SERVICE_CODE;
+            modbus_master_regs.service_6.disable = false;
+            modbus_master_regs.service_7 = SERVICE_CODE;
+            modbus_master_regs.service_7.disable = false;
+            modbus_master_regs.service_8 = SERVICE_CODE;
+            modbus_master_regs.service_8.disable = false;
+            modbus_master_regs.service_9 = SERVICE_CODE;
+            modbus_master_regs.service_9.disable = false;
             reset_n_set.max = modbus.quantity.lamps;
             change_screen(reset_n_set);
         }}
@@ -112,8 +148,24 @@ struct Menu : TickSubscriber {
     };
 
     void save() {
-        modbus_master_regs.save_setting = SAVE_SYSTEM_SETTING_CODE;
-        modbus_master_regs.save_setting.disable = false;
+        modbus_master_regs.save_setting_1 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_1.disable = false;
+        modbus_master_regs.save_setting_2 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_2.disable = false;
+        modbus_master_regs.save_setting_3 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_3.disable = false;
+        modbus_master_regs.save_setting_4 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_4.disable = false;
+        modbus_master_regs.save_setting_5 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_5.disable = false;
+        modbus_master_regs.save_setting_6 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_6.disable = false;
+        modbus_master_regs.save_setting_7 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_7.disable = false;
+        modbus_master_regs.save_setting_8 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_8.disable = false;
+        modbus_master_regs.save_setting_9 = SAVE_SYSTEM_SETTING_CODE;
+        modbus_master_regs.save_setting_9.disable = false;
     }
 
     int reset_n {1};
@@ -140,10 +192,19 @@ struct Menu : TickSubscriber {
             } else if (reset_n == 5) {
                 modbus_master_regs.reset_resource_5 = RESET_LAMP_RESOURCE_CODE;
                 modbus_master_regs.reset_resource_5.disable = false;
-            } else {
+            } else if (reset_n == 6){
                 modbus_master_regs.reset_resource_6 = RESET_LAMP_RESOURCE_CODE;
                 modbus_master_regs.reset_resource_6.disable = false;
-            }
+            } else if (reset_n == 7){
+                modbus_master_regs.reset_resource_7 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_7.disable = false;
+            } else if (reset_n == 8){
+                modbus_master_regs.reset_resource_8 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_8.disable = false;
+            } else {
+                modbus_master_regs.reset_resource_9 = RESET_LAMP_RESOURCE_CODE;
+                modbus_master_regs.reset_resource_9.disable = false;
+            } 
             save();
             change_screen(work_time_screen);
         }}
