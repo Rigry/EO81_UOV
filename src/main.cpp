@@ -86,6 +86,9 @@ int main()
             .lamps = 5,
             .extantions = 0
         };
+        uint8_t qty_lamps_uov          = 5;
+        uint8_t qty_lamps_ext_1        = 0;
+        uint8_t qty_lamps_ext_2        = 0;
         uint16_t uv_level_highest      = 0x0100;
         uint8_t  model_number          = 0;
         uint8_t  temperature_recovery  = 20;
@@ -144,9 +147,21 @@ int main()
         , RTS_slave
     >(flash.modbus_address, flash.uart_set);
 
-    struct {
-        Register<10, Modbus_function::read_03, 0> uv_level;
-        Register<10, Modbus_function::read_03, 1> temperature;
+    struct Reg {
+        Register<1,  Modbus_function::read_03,  5> lamps_1;
+        Register<1,  Modbus_function::read_03,  6> bad_lamps_1;
+        Register<1,  Modbus_function::read_03,  7> hours_1;
+        Register<1,  Modbus_function::write_16, 4> reset_hours_1;
+        Register<1,  Modbus_function::write_16, 5> n_lamp_1;
+
+        Register<2,  Modbus_function::read_03,  5> lamps_2;
+        Register<2,  Modbus_function::read_03,  6> bad_lamps_2;
+        Register<2,  Modbus_function::read_03,  7> hours_2;
+        Register<2,  Modbus_function::write_16, 4> reset_hours_2;
+        Register<2,  Modbus_function::write_16, 5> n_lamp_2;
+
+        Register<10, Modbus_function::read_03,  0> uv_level;
+        Register<10, Modbus_function::read_03,  1> temperature;
     } modbus_master_regs;
 
     decltype(auto) volatile modbus_master = make_modbus_master <
@@ -156,11 +171,34 @@ int main()
         , RTS_master
     > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
+
+    bool ext_1{flash.quantity.extantions == 1};
+    bool ext_2{flash.quantity.extantions == 2};
+    if(flash.quantity.extantions == 0) {
+        modbus_master_regs.lamps_1.disable       = true;
+        modbus_master_regs.bad_lamps_1.disable   = true;
+        modbus_master_regs.hours_1.disable       = true;
+        modbus_master_regs.reset_hours_1.disable = true;
+        modbus_master_regs.n_lamp_1.disable      = true;
+
+        modbus_master_regs.lamps_2.disable       = true;
+        modbus_master_regs.bad_lamps_2.disable   = true;
+        modbus_master_regs.hours_2.disable       = true;
+        modbus_master_regs.reset_hours_2.disable = true;
+        modbus_master_regs.n_lamp_2.disable      = true;
+    } else if(flash.quantity.extantions == 1) {
+        modbus_master_regs.lamps_2.disable       = true;
+        modbus_master_regs.bad_lamps_2.disable   = true;
+        modbus_master_regs.hours_2.disable       = true;
+        modbus_master_regs.reset_hours_2.disable = true;
+        modbus_master_regs.n_lamp_2.disable      = true;
+    } else {}
+
     // подсчёт часов работы
     auto work_count = Work_count{
           modbus_slave.outRegs.bad_lamps[0]
         , modbus_slave.outRegs.hours
-        , flash.quantity.lamps
+        , flash.qty_lamps_uov
     };
 
     [[maybe_unused]] auto __ = Safe_flash_updater<
@@ -263,11 +301,45 @@ int main()
     // Определение плохих ламп
     Lamps::make<
         EPRA1,EPRA2,EPRA3,EPRA4,EPRA5,EPRA6,EPRA7,EPRA8,EPRA9,EPRA10
-    >(modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
+    >(modbus_slave.outRegs.bad_lamps[0], flash.qty_lamps_uov);
 
+    uint8_t n_lamp_1{0};
+    uint8_t n_lamp_2{0};
+
+    modbus_master_regs.reset_hours_1 = 0;
+    modbus_master_regs.reset_hours_2 = 0;
 
     while (1) {
+
+        if (not modbus_master_regs.lamps_1.disable or not modbus_master_regs.lamps_2.disable) {
+            flash.qty_lamps_ext_1 = ext_1 ? modbus_master_regs.lamps_1 : 0;
+            flash.qty_lamps_ext_2 = ext_2 ? modbus_master_regs.lamps_2 : 0;
+            flash.quantity.lamps = flash.qty_lamps_uov + flash.qty_lamps_ext_1 + flash.qty_lamps_ext_2;
+            modbus_slave.outRegs.quantity = flash.quantity;
+            if(ext_1) {
+                modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_2  > 0;
+            } 
+            if(ext_2) {
+                modbus_master_regs.lamps_2.disable = flash.qty_lamps_ext_2  > 0;
+            }
+        }
+
+        if (ext_2) {
+            modbus_slave.outRegs.hours[flash.qty_lamps_uov + flash.qty_lamps_ext_1 + n_lamp_2++] = modbus_master_regs.hours_2;
+            n_lamp_2 = n_lamp_2 > (flash.qty_lamps_ext_2 - 1) ? 0 : n_lamp_2;
+            modbus_master_regs.n_lamp_2 = n_lamp_2;
+        }
+        if (ext_1) {
+            modbus_slave.outRegs.hours[flash.qty_lamps_uov + n_lamp_1++] = modbus_master_regs.hours_1;
+            n_lamp_1 = n_lamp_1 > (flash.qty_lamps_ext_1 - 1) ? 0 : n_lamp_1;
+            modbus_master_regs.n_lamp_1 = n_lamp_1;
+        }
+
+        modbus_slave.outRegs.bad_lamps[1] = modbus_master_regs.bad_lamps_1;
+        modbus_slave.outRegs.bad_lamps[2] = modbus_master_regs.bad_lamps_2;
+
         modbus_master();
+
         modbus_slave([&](auto registr){
             static bool unblock = false;
             switch (registr) {
@@ -309,7 +381,7 @@ int main()
                 //     = modbus_slave.inRegs.qty_uv_lamps;
                 // break;
                 case ADR(uv_level_highest):
-                    flash.quantity.lamps 
+                    flash.uv_level_highest
                     = modbus_slave.outRegs.uv_level_highest
                     = modbus_slave.inRegs.uv_level_highest;
                 break;
@@ -325,13 +397,15 @@ int main()
         modbus_slave.outRegs.max_temperature = flash.max_temperature;
         modbus_slave.outRegs.uv_level_min = flash.uv_level_min;
         modbus_slave.outRegs.uv_level = uv_level_percent;
+        modbus_slave.outRegs.quantity = flash.quantity;
         
 
         work_flags.overheat = overheat;
 
         if (flash.exist.uv_sensor and uv) {
             set_if_greater (&flash.uv_level_highest, uv_level);
-            uv_level_percent = uv_level * 100 / flash.uv_level_highest;
+            uv_level_percent = 60;
+            // uv_level_percent = uv_level * 100 / flash.uv_level_highest;
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
         }
 

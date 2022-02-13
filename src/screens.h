@@ -170,7 +170,9 @@ struct Bad_lamps_screen : Screen {
     Eventer out_event;
     Callback<> out_callback;
     const std::array<uint16_t, glob::max_extantions+1>& bad_lamps;
-    const uint8_t& qty_lamps;
+    const uint8_t& qty_uov_lamps;
+    uint8_t& qty_ext_lamps_1;
+    uint8_t& qty_ext_lamps_2;
     const Flags& flags;
 
     Bad_lamps_screen (
@@ -178,14 +180,18 @@ struct Bad_lamps_screen : Screen {
         , Out_event    out_event
         , Out_callback out_callback
         , std::array<uint16_t, glob::max_extantions+1>& bad_lamps
-        , uint8_t& qty_lamps
+        , uint8_t& qty_uov_lamps
+        , uint8_t& qty_ext_lamps_1
+        , uint8_t& qty_ext_lamps_2
         , Flags& flags
-    ) : lcd          {lcd}
-      , out_event    {out_event.value}
-      , out_callback {out_callback.value}
-      , bad_lamps    {bad_lamps}
-      , qty_lamps    {qty_lamps}
-      , flags        {flags}
+    ) : lcd             {lcd}
+      , out_event       {out_event.value}
+      , out_callback    {out_callback.value}
+      , bad_lamps       {bad_lamps}
+      , qty_uov_lamps   {qty_uov_lamps}
+      , qty_ext_lamps_1 {qty_ext_lamps_1}
+      , qty_ext_lamps_2 {qty_ext_lamps_2}
+      , flags           {flags}
     {}
 
     void init() override {
@@ -204,7 +210,7 @@ struct Bad_lamps_screen : Screen {
         }
 
         // TODO добавить логику для плат расширений
-        if (bad_lamps[0] == 0) {
+        if (bad_lamps[0] == 0 and bad_lamps[1] == 0 and bad_lamps[2] == 0) {
             lcd.center() << "Отсуствуют";
             lcd << clear_after;
             return;
@@ -212,9 +218,27 @@ struct Bad_lamps_screen : Screen {
 
         uint16_t constexpr max_on_screen {20};
         auto bad_qty {0};
-        for (auto i {0}; i < qty_lamps ; i++) {
+        for (auto i {0}; i < qty_uov_lamps ; i++) {
             if ((bad_lamps[0] >> i) & 0b1) {
                 lcd.width(4) << i+1;
+                bad_qty++;
+            }
+            if (bad_qty == max_on_screen) {
+                break;
+            }
+        }
+        for (auto i {0}; i < qty_ext_lamps_1 ; i++) {
+            if ((bad_lamps[1] >> i) & 0b1) {
+                lcd.width(4) << i+qty_uov_lamps+1;
+                bad_qty++;
+            }
+            if (bad_qty == max_on_screen) {
+                break;
+            }
+        }
+        for (auto i {0}; i < qty_ext_lamps_2 ; i++) {
+            if ((bad_lamps[2] >> i) & 0b1) {
+                lcd.width(4) << i+qty_uov_lamps+qty_ext_lamps_2+1;
                 bad_qty++;
             }
             if (bad_qty == max_on_screen) {

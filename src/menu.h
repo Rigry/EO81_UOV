@@ -81,7 +81,7 @@ struct Menu : TickSubscriber {
     Bad_lamps_screen bad_lamps_screen {
           lcd, Out_event{buttons_events.out}
         , Out_callback       { [this]{ change_screen(alarm_select);  }}
-        , modbus.bad_lamps, modbus.quantity.lamps, modbus.work_flags
+        , modbus.bad_lamps, flash.qty_lamps_uov, flash.qty_lamps_ext_1, flash.qty_lamps_ext_2, modbus.work_flags
     };
 
     Select_screen<3> work_select {
@@ -283,8 +283,8 @@ struct Menu : TickSubscriber {
     Set_screen<uint8_t> qty_lamps_set {
           lcd, buttons_events
         , "Кол-во ламп тут"
-        , flash.quantity.lamps
-        , Min<uint8_t>{1}, Max<uint8_t>{16}
+        , flash.qty_lamps_uov
+        , Min<uint8_t>{0}, Max<uint8_t>{10}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , Enter_callback  { [this]{
             modbus.quantity = flash.quantity;

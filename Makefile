@@ -60,7 +60,7 @@ ASFLAGS_F1 = $(MCU_F1) $(OPT) -Wall -fdata-sections -ffunction-sections
 CFLAGS_F1  = -DVERSION=\"$(GIT_VERSION)\"
 CFLAGS_F1 += $(MCU_F1) $(C_DEFS_F1) $(C_INCLUDES) $(C_INCLUDES_F1) $(OPT)
 CFLAGS_F1 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -fexec-charset=cp1251
-CFLAGS_F1 += -g -gdwarf-2 
+CFLAGS_F1 += -g -gdwarf-2 -fpermissive
 
 
 # Generate dependency information
