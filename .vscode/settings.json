@@ -46,6 +46,7 @@
     "bitset": "cpp",
     "iostream": "cpp",
     "cstdarg": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "memory_resource": "cpp"
 }
 }
