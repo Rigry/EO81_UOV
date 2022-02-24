@@ -281,7 +281,7 @@ struct Work_time_screen : Screen {
         eventers.out   (nullptr);
     }
 
-    void draw() override {}
+    void draw() override {redraw();}
 
     void set_first_lamp (int v) {
         first_lamp = v;

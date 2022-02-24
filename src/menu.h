@@ -10,7 +10,7 @@
 
 
 
-template<class Pins, class Flash_data, class Modbus_regs>
+template<class Pins, class Flash_data, class Modbus_regs, class Reg>
 struct Menu : TickSubscriber {
     String_buffer lcd {};
     HD44780& hd44780 { HD44780::make(Pins{}, lcd.get_buffer()) };
@@ -20,6 +20,7 @@ struct Menu : TickSubscriber {
     Flash_data&   flash;
     Modbus_regs&  modbus;
     Work_count&   work_count;
+    Reg& master_regs;
 
     Screen* current_screen {&main_screen};
     size_t tick_count{0};
@@ -42,8 +43,9 @@ struct Menu : TickSubscriber {
         , Flash_data&   flash
         , Modbus_regs&  modbus
         , Work_count&   work_count
+        , Reg&          master_regs
     ) : up{up}, down{down}, enter{enter}
-      , flash{flash}, modbus{modbus}, work_count{work_count}
+      , flash{flash}, modbus{modbus}, work_count{work_count}, master_regs {master_regs}
     {
         tick_subscribe();
         current_screen->init();
@@ -90,6 +92,8 @@ struct Menu : TickSubscriber {
         , Line {"Просмотр наработки",[this]{ change_screen(work_time_screen);}}
         , Line {"Сброс всех ламп   ",[this]{
             work_count.reset();
+            master_regs.reset_hours_1 = 1023; // 10 bits
+            master_regs.reset_hours_2 = 1023; // 10 bits
             flash.count.reset_all++;
             change_screen(work_time_screen); // чтоб увидеть действие
         }}
@@ -102,7 +106,8 @@ struct Menu : TickSubscriber {
 
     Work_time_screen work_time_screen {
           lcd, buttons_events
-        , Out_callback       { [this]{ change_screen(work_select);  }}
+        , Out_callback       { [this]{ change_screen(work_select); master_regs.reset_hours_1 = 0; 
+                                                                   master_regs.reset_hours_2 = 0; }}
         , modbus.hours, modbus.quantity.lamps
     };
 
@@ -114,7 +119,14 @@ struct Menu : TickSubscriber {
         , Min<int>{1}, Max<int>{1}
         , Out_callback      { [this]{ change_screen(work_select);  }}
         , Enter_callback    { [this]{
-            work_count.reset(reset_n-1);
+            if ((reset_n-1) < flash.qty_lamps_uov) {
+                work_count.reset(reset_n-1);
+            } else if ((reset_n-1) < (flash.qty_lamps_ext_1 + flash.qty_lamps_uov)) {
+                master_regs.reset_hours_1 = 1 <<  (reset_n-1-flash.qty_lamps_uov);
+            } else if ((reset_n-1) < (flash.qty_lamps_ext_2 + flash.qty_lamps_ext_1 + flash.qty_lamps_uov))  {
+                master_regs.reset_hours_2 = 1 <<  (reset_n-1-flash.qty_lamps_uov-flash.qty_lamps_ext_1);
+            }
+            
             flash.count.reset_one++;
             work_time_screen.set_first_lamp(reset_n-1);
             change_screen(work_time_screen);

@@ -235,6 +235,7 @@ int main()
         , flash
         , modbus_slave.outRegs
         , work_count
+        , modbus_master_regs
     );
 
 
@@ -396,7 +397,7 @@ int main()
                     = modbus_slave.inRegs.uv_level_highest;
                 break;
                 case ADR(reset_hours): // TODO без плат расширения
-                work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
+                    work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
                 break;
             } // switch
         });
