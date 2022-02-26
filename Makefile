@@ -3,7 +3,7 @@ DEBUG = 1
 OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
-MCULIB_VERSION = v1.06
+MCULIB_VERSION = v1.08
 GIT_VERSION := "$(shell git describe --always --tags)"
 
 ######################################
