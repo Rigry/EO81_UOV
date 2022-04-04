@@ -155,7 +155,7 @@ struct Main_screen : Screen {
             return;
         }
         if (flags.bad_lamps) {
-            lcd << "ЛАМПЫ " << next_line;
+            lcd << "ЛАМПЫ" << next_line;
             return;
         }
         if (flags.uv_low_level) {
@@ -238,7 +238,7 @@ struct Bad_lamps_screen : Screen {
         }
         for (auto i {0}; i < qty_ext_lamps_2 ; i++) {
             if ((bad_lamps[2] >> i) & 0b1) {
-                lcd.width(4) << i+qty_uov_lamps+qty_ext_lamps_2+1;
+                lcd.width(4) << i+qty_uov_lamps+qty_ext_lamps_1+1;
                 bad_qty++;
             }
             if (bad_qty == max_on_screen) {
