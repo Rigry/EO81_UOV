@@ -135,7 +135,7 @@ struct Main_screen : Screen {
             lcd.width(2) << temperatura << "C  ";
         }
         
-        lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");
+        lcd.line(3).cursor(7)  << (flags.uv_on ? "УФ" : "  ");
         if (exist.uv_sensor) {
             if (flags.uv_on)
                 lcd.cursor(10).width(3) << uv_level << "%";
