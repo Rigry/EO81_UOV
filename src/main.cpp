@@ -318,19 +318,27 @@ int main()
     while (1) {
 
         if (not modbus_master_regs.lamps_1.disable or not modbus_master_regs.lamps_2.disable) {
-            flash.qty_lamps_ext_1 = ext_1 ? modbus_master_regs.lamps_1 : 0;
+            flash.qty_lamps_ext_1 = (ext_1 or ext_2) ? modbus_master_regs.lamps_1 : 0;
             flash.qty_lamps_ext_2 = ext_2 ? modbus_master_regs.lamps_2 : 0;
             flash.quantity.lamps = flash.qty_lamps_uov + flash.qty_lamps_ext_1 + flash.qty_lamps_ext_2;
             modbus_slave.outRegs.quantity = flash.quantity;
             if(ext_1) {
-                modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_2  > 0;
+                modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_1  > 0;
             } 
             if(ext_2) {
+                modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_1  > 0;
                 modbus_master_regs.lamps_2.disable = flash.qty_lamps_ext_2  > 0;
             }
         }
 
         if (ext_2) {
+
+            if (modbus_master_regs.n_lamp_1 == modbus_master_regs.lamp_1) {
+                modbus_slave.outRegs.hours[flash.qty_lamps_uov + n_lamp_1++] = modbus_master_regs.hours_1;
+                n_lamp_1 = n_lamp_1 > (flash.qty_lamps_ext_1 - 1) ? 0 : n_lamp_1;
+                modbus_master_regs.n_lamp_1 = n_lamp_1;
+            }
+
             if (modbus_master_regs.n_lamp_2 == modbus_master_regs.lamp_2) {
                 modbus_slave.outRegs.hours[flash.qty_lamps_uov + flash.qty_lamps_ext_1 + n_lamp_2++] = modbus_master_regs.hours_2;
                 n_lamp_2 = n_lamp_2 > (flash.qty_lamps_ext_2 - 1) ? 0 : n_lamp_2;
