@@ -135,15 +135,16 @@ struct Main_screen : Screen {
             lcd.width(2) << temperatura << "C  ";
         }
         
-        lcd.cursor(7)  << (flags.uv_on ? "УФ" : "  ");
+        lcd.line(3).cursor(7)  << (flags.uv_on ? "УФ" : "  ");
         if (exist.uv_sensor) {
             if (flags.uv_on)
-                lcd.cursor(10).width(3) << uv_level << "%";
+                lcd.cursor(9).width(3) << uv_level << "%";
             else
-                lcd.cursor(10) << "    ";
+                lcd.cursor(9) << "    ";
         }
 
-        lcd.cursor(16) << (flags.us_on ? "УЗ" : "  ");
+        lcd.cursor(15) << (flags.us_on ? "УЗ" : "  ");
+        lcd.cursor(18) << (flags.rc ? "ДУ" : "  ");
 
         lcd.line(2).cursor(8);
         if (not flags.is_alarm() ) {
@@ -159,7 +160,7 @@ struct Main_screen : Screen {
             return;
         }
         if (flags.uv_low_level) {
-            lcd << "УРОВЕНЬ" << next_line;
+            lcd << "УРОВЕНЬ  УФ" << next_line;
             return;
         }
     }
