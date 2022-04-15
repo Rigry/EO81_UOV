@@ -348,20 +348,24 @@ int main()
             work_flags.rc = false;
     };
     modbus_slave.force_single_coil_05[0] = [&](bool on) {
-        if (on and not overheat)
-            work_flags.us_started = true;
-        if (not on)
-            work_flags.us_started = false;
+        if (work_flags.rc) {
+            if (on and not overheat)
+                work_flags.us_started = true;
+            if (not on)
+                work_flags.us_started = false;
+        }
     };
     modbus_slave.force_single_coil_05[1] = [&](bool on) {
-        if (on and not overheat)
-            work_flags.uv_started = true;
-        if (not on)
-            work_flags.uv_started = false;
+        if (work_flags.rc) {
+            if (on and not overheat)
+                work_flags.uv_started = true;
+            if (not on)
+                work_flags.uv_started = false;
+        }
     };
     
 
-    std::array<bool, 9> state_lamps{false};
+    std::array<bool, 6> state_lamps{false};
 
     // Определение плохих ламп
     Lamps::make(state_lamps, modbus_slave.outRegs.bad_lamps[0], flash.quantity.lamps);
