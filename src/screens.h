@@ -220,8 +220,12 @@ struct Bad_lamps_screen : Screen {
         auto bad_qty {0};
         for (auto i {0}; i < qty_uov_lamps ; i++) {
             if ((bad_lamps[0] >> i) & 0b1) {
-                lcd.width(3) << i+1;
                 bad_qty++;
+                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
+                    lcd.width(2) << i+1;
+                } else {
+                    lcd.width(3) << i+1;
+                }
             }
             if (bad_qty == max_on_screen) {
                 break;
@@ -229,8 +233,13 @@ struct Bad_lamps_screen : Screen {
         }
         for (auto i {0}; i < qty_ext_lamps_1 ; i++) {
             if ((bad_lamps[1] >> i) & 0b1) {
-                lcd.width(3) << i+qty_uov_lamps+1;
                 bad_qty++;
+                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
+                    lcd.width(2) << i+qty_uov_lamps+1;
+                } else {
+                    lcd.width(3) << i+qty_uov_lamps+1;
+                }
+
             }
             if (bad_qty == max_on_screen) {
                 break;
@@ -238,8 +247,12 @@ struct Bad_lamps_screen : Screen {
         }
         for (auto i {0}; i < qty_ext_lamps_2 ; i++) {
             if ((bad_lamps[2] >> i) & 0b1) {
-                lcd.width(3) << i+qty_uov_lamps+qty_ext_lamps_1+1;
                 bad_qty++;
+                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
+                    lcd.width(2) << i+qty_uov_lamps+qty_ext_lamps_1+1;
+                } else {
+                    lcd.width(3) << i+qty_uov_lamps+qty_ext_lamps_1+1;
+                }
             }
             if (bad_qty == max_on_screen) {
                 break;
