@@ -317,11 +317,14 @@ int main()
 
     while (1) {
 
+        ext_1 = flash.quantity.extantions == 1;
+        ext_2 = flash.quantity.extantions == 2;
+
         if (not modbus_master_regs.lamps_1.disable or not modbus_master_regs.lamps_2.disable) {
             flash.qty_lamps_ext_1 = (ext_1 or ext_2) ? modbus_master_regs.lamps_1 : 0;
             flash.qty_lamps_ext_2 = ext_2 ? modbus_master_regs.lamps_2 : 0;
             flash.quantity.lamps = flash.qty_lamps_uov + flash.qty_lamps_ext_1 + flash.qty_lamps_ext_2;
-            modbus_slave.outRegs.quantity = flash.quantity;
+            // modbus_slave.outRegs.quantity = flash.quantity;
             if(ext_1) {
                 modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_1  > 0;
             } 
@@ -329,6 +332,9 @@ int main()
                 modbus_master_regs.lamps_1.disable = flash.qty_lamps_ext_1  > 0;
                 modbus_master_regs.lamps_2.disable = flash.qty_lamps_ext_2  > 0;
             }
+        } else {
+            flash.quantity.lamps = flash.qty_lamps_uov;
+            // modbus_slave.outRegs.quantity = flash.quantity;
         }
 
         if (ext_2) {
