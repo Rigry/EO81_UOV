@@ -433,6 +433,8 @@ int main()
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
         }
 
+        work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+
         on_us (work_flags.us_started and not overheat);
         on_uv (work_flags.uv_started and not overheat);
 
