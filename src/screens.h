@@ -167,17 +167,17 @@ struct Main_screen : Screen {
 
 struct Bad_lamps_screen : Screen {
     String_buffer& lcd;
-    Eventer out_event;
+    Buttons_events eventers;
     Callback<> out_callback;
     const std::array<uint16_t, glob::max_extantions+1>& bad_lamps;
     const uint8_t& qty_uov_lamps;
-    uint8_t& qty_ext_lamps_1;
-    uint8_t& qty_ext_lamps_2;
+    const uint8_t& qty_ext_lamps_1;
+    const uint8_t& qty_ext_lamps_2;
     const Flags& flags;
 
     Bad_lamps_screen (
           String_buffer& lcd
-        , Out_event    out_event
+        , Buttons_events eventers
         , Out_callback out_callback
         , std::array<uint16_t, glob::max_extantions+1>& bad_lamps
         , uint8_t& qty_uov_lamps
@@ -185,7 +185,7 @@ struct Bad_lamps_screen : Screen {
         , uint8_t& qty_ext_lamps_2
         , Flags& flags
     ) : lcd             {lcd}
-      , out_event       {out_event.value}
+      , eventers        {eventers}
       , out_callback    {out_callback.value}
       , bad_lamps       {bad_lamps}
       , qty_uov_lamps   {qty_uov_lamps}
@@ -195,12 +195,44 @@ struct Bad_lamps_screen : Screen {
     {}
 
     void init() override {
-        out_event ([this]{ out_callback(); });
+        eventers.up    ([this]{ up();    });
+        eventers.down  ([this]{ down();  });
+        eventers.out   ([this]{ out_callback(); });
+        redraw();
     }
     void deinit() override {
-        out_event (nullptr);
+        eventers.up    (nullptr);
+        eventers.down  (nullptr);
+        eventers.out   (nullptr);
     }
-    void draw() override {
+
+    void draw() override {redraw();}
+
+private:
+
+    int first_lamp {0};
+    std::array<uint16_t, glob::max_lamps> lamp_is_bad{0};
+
+
+    void down() {
+        if (first_lamp + 20 >= qty_uov_lamps + qty_ext_lamps_1 + qty_ext_lamps_2)
+            return;
+        first_lamp += 5;
+
+        redraw();
+    }
+
+    void up() {
+        if (first_lamp == 0) {
+            return;
+        }
+        first_lamp -= 5;
+
+        redraw();
+    }
+
+    void redraw() {
+
         lcd.line(0);
 
         if (not flags.uv_on) {
@@ -209,56 +241,46 @@ struct Bad_lamps_screen : Screen {
             return;
         }
 
-        // TODO добавить логику для плат расширений
         if (bad_lamps[0] == 0 and bad_lamps[1] == 0 and bad_lamps[2] == 0) {
             lcd.center() << "Отсуствуют";
             lcd << clear_after;
             return;
         }
 
-        uint16_t constexpr max_on_screen {28};
+        uint16_t constexpr max_on_screen {20};
         auto bad_qty {0};
-        for (auto i {0}; i < qty_uov_lamps ; i++) {
-            if ((bad_lamps[0] >> i) & 0b1) {
-                bad_qty++;
-                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
-                    lcd.width(2) << i+1;
-                } else {
-                    lcd.width(3) << i+1;
+
+            for (auto i {0}; i < qty_uov_lamps; i++) {
+              if ((bad_lamps[0] >> i) & 0b1) {
+                   lamp_is_bad[bad_qty++] = i + 1;
                 }
             }
-            if (bad_qty == max_on_screen) {
-                break;
+
+            for (auto i {0}; i < qty_ext_lamps_1; i++) {
+              if ((bad_lamps[1] >> i) & 0b1) {
+                   lamp_is_bad[bad_qty++] = i + 11;
+                }
             }
-        }
-        for (auto i {0}; i < qty_ext_lamps_1 ; i++) {
-            if ((bad_lamps[1] >> i) & 0b1) {
-                bad_qty++;
-                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
-                    lcd.width(2) << i+qty_uov_lamps+1;
-                } else {
-                    lcd.width(3) << i+qty_uov_lamps+1;
+
+            for (auto i {0}; i < qty_ext_lamps_2; i++) {
+              if ((bad_lamps[2] >> i) & 0b1) {
+                   lamp_is_bad[bad_qty++] = i + 21;
+                }
+            }
+
+            for (auto j {0}; j < (bad_qty - first_lamp); j++) {
+
+                if (j == max_on_screen) {
+                    break;
                 }
 
+                lcd.width(4) << lamp_is_bad[first_lamp + j];
             }
-            if (bad_qty == max_on_screen) {
-                break;
-            }
-        }
-        for (auto i {0}; i < qty_ext_lamps_2 ; i++) {
-            if ((bad_lamps[2] >> i) & 0b1) {
-                bad_qty++;
-                if (bad_qty == 1 or bad_qty == 8 or bad_qty == 15 or bad_qty == 22) {
-                    lcd.width(2) << i+qty_uov_lamps+qty_ext_lamps_1+1;
-                } else {
-                    lcd.width(3) << i+qty_uov_lamps+qty_ext_lamps_1+1;
-                }
-            }
-            if (bad_qty == max_on_screen) {
-                break;
-            }
+        if ((bad_qty - first_lamp) >= max_on_screen) {
+            return;
         }
         lcd << clear_after;
+
     }
 };
 

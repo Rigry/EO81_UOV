@@ -81,7 +81,7 @@ struct Menu : TickSubscriber {
     };
 
     Bad_lamps_screen bad_lamps_screen {
-          lcd, Out_event{buttons_events.out}
+          lcd, buttons_events
         , Out_callback       { [this]{ change_screen(alarm_select);  }}
         , modbus.bad_lamps, flash.qty_lamps_uov, flash.qty_lamps_ext_1, flash.qty_lamps_ext_2, modbus.work_flags
     };

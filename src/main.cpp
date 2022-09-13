@@ -175,7 +175,7 @@ int main()
     > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
 
-    volatile bool ext_1{flash.quantity.extantions == 1};
+    volatile bool ext_1{flash.quantity.extantions};
     volatile bool ext_2{flash.quantity.extantions == 2};
     if(flash.quantity.extantions == 0) {
         modbus_master_regs.lamps_1.disable       = true;
@@ -317,11 +317,13 @@ int main()
 
     while (1) {
 
-        ext_1 = flash.quantity.extantions == 1;
+        ext_1 = flash.quantity.extantions;
         ext_2 = flash.quantity.extantions == 2;
 
+        modbus_master_regs.lamps_1.disable = not ext_1;
+
         if (not modbus_master_regs.lamps_1.disable or not modbus_master_regs.lamps_2.disable) {
-            flash.qty_lamps_ext_1 = (ext_1 or ext_2) ? modbus_master_regs.lamps_1 : 0;
+            flash.qty_lamps_ext_1 = ext_1 ? modbus_master_regs.lamps_1 : 0;
             flash.qty_lamps_ext_2 = ext_2 ? modbus_master_regs.lamps_2 : 0;
             flash.quantity.lamps = flash.qty_lamps_uov + flash.qty_lamps_ext_1 + flash.qty_lamps_ext_2;
             // modbus_slave.outRegs.quantity = flash.quantity;
