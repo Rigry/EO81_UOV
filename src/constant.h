@@ -5,7 +5,19 @@
 struct Exsist {
     bool temp_sensor  :1;
     bool uv_sensor    :1;
-    uint8_t           :6;
+    bool dry_contacts :1;
+    uint8_t           :5;
+};
+
+struct Control {
+    bool control_us : 1;
+    bool control_uv : 1;
+    bool distance   : 1;
+    uint16_t        : 5;
+    bool us_on      : 1;
+    bool uv_on      : 1;
+    bool alarm      : 1;
+    uint16_t        : 5;
 };
 
 struct Quantity {
@@ -27,8 +39,11 @@ struct Flags {
     bool overheat     : 1;
     bool us_started   : 1;
     bool uv_started   : 1;
-    bool bad_lamps    : 1;
-    uint16_t          : 9;
+    bool bad_lamps    : 1; 
+    bool distance     : 1;
+    bool mode         : 1;
+    bool not_flow     : 1;
+    uint16_t          : 6;
     bool is_alarm() { return bad_lamps or overheat or uv_low_level; }
 };
 

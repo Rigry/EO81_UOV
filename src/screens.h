@@ -47,6 +47,15 @@ constexpr std::string_view exist_to_string(int i) {
     return exist[i];
 }
 
+constexpr auto reassign = std::array {
+    "не переназначать",
+    "переназначить"
+};
+
+constexpr std::string_view reassign_to_string(int i) {
+    return reassign[i];
+}
+
 constexpr auto confirm = std::array {
     "нет",
     "да"
@@ -78,6 +87,15 @@ constexpr auto parity = std::array {
 
 constexpr std::string_view parity_to_string(int i) {
     return parity[i];
+}
+
+constexpr auto mode = std::array {
+    "Ручной",
+    "Авто"
+};
+
+constexpr std::string_view mode_to_string(int i) {
+    return mode[i];
 }
 
 
@@ -144,6 +162,8 @@ struct Main_screen : Screen {
         }
 
         lcd.cursor(16) << (flags.us_on ? "УЗ" : "  ");
+
+        lcd.cursor(19) << (flags.distance ? "Д" : " ");
 
         lcd.line(2).cursor(8);
         if (not flags.is_alarm() ) {
