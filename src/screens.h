@@ -80,6 +80,15 @@ constexpr std::string_view parity_to_string(int i) {
     return parity[i];
 }
 
+constexpr auto mode = std::array {
+    "Ручной",
+    "Авто"
+};
+
+constexpr std::string_view mode_to_string(int i) {
+    return mode[i];
+}
+
 
 
 struct Main_screen : Screen {
@@ -144,7 +153,7 @@ struct Main_screen : Screen {
         }
 
         lcd.cursor(15) << (flags.us_on ? "УЗ" : "  ");
-        lcd.cursor(18) << (flags.rc ? "ДУ" : "  ");
+        lcd.cursor(18) << (flags.distance ? "ДУ" : "  ");
 
         lcd.line(2).cursor(8);
         if (not flags.is_alarm() ) {

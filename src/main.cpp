@@ -99,6 +99,8 @@ int main()
             .reset_one = 0,
             .reset_log = 0
         };
+        bool automatic = false;
+        bool reassignment = false;
     } flash;
 
     [[maybe_unused]] auto _ = Flash_updater<
@@ -148,6 +150,9 @@ int main()
 
         Register<10, Modbus_function::read_03, 0> uv_level;
         Register<10, Modbus_function::read_03, 1> temperature;
+
+        Register<101, Modbus_function::read_03,  4> control_read;
+        Register<101, Modbus_function::write_16, 4> control_write;
 
         Register<11, Modbus_function::read_04, 6> state_lamp_1;
         // Register<11, Modbus_function::read_04, 4> error_lamp_1;
@@ -253,6 +258,9 @@ int main()
         , RTS_master
     > (100_ms, flash.uart_set_master, modbus_master_regs); // FIX flash.uart_set placeholder
 
+    modbus_master_regs.control_write = 0;
+    modbus_master_regs.control_read = 0;
+
     #define ADR(reg) GET_ADR(In_regs, reg)
     modbus_slave.outRegs.device_code       = 8;
     modbus_slave.outRegs.factory_number    = flash.factory_number;
@@ -311,14 +319,13 @@ int main()
         // modbus_master_regs.on_off_9 = on;
     };
 
-    uv_button.set_down_callback([&]{
-        if (not work_flags.rc) {
-            if (overheat) {
-                work_flags.uv_started = false;
-                return;
-            }
-            work_flags.uv_started ^= 1;
+     uv_button.set_down_callback([&]{
+        if (overheat) {
+            work_flags.uv_started = false;
+            return;
         }
+        if(not work_flags.distance)
+            work_flags.uv_started ^= 1;
     });
 
     // US control
@@ -331,37 +338,26 @@ int main()
     };
 
     us_button.set_down_callback([&]{
-        if (not work_flags.rc) {
-            if (overheat) {
-                work_flags.us_started = false;
-                return;
-            }
-            work_flags.us_started ^= 1;
+        if (overheat) {
+            work_flags.us_started = false;
+            return;
         }
+        if (not work_flags.distance)
+            work_flags.us_started ^= 1;
     });
 
     // управление по модбас
-    modbus_slave.force_single_coil_05[2] = [&](bool on) {
-        if (on)
-            work_flags.rc = true;
-        if (not on)
-            work_flags.rc = false;
-    };
     modbus_slave.force_single_coil_05[0] = [&](bool on) {
-        if (work_flags.rc) {
-            if (on and not overheat)
+            if (on and not overheat and not work_flags.distance)
                 work_flags.us_started = true;
             if (not on)
                 work_flags.us_started = false;
-        }
     };
     modbus_slave.force_single_coil_05[1] = [&](bool on) {
-        if (work_flags.rc) {
-            if (on and not overheat)
+            if (on and not overheat and not work_flags.distance)
                 work_flags.uv_started = true;
             if (not on)
                 work_flags.uv_started = false;
-        }
     };
     
 
@@ -443,7 +439,7 @@ int main()
                 // work_count.reset_by_mask(modbus_slave.inRegs.reset_hours[0]);
                 break;
             } // switch
-        }, [&](auto registr){}
+        }
         );
 
         overheat.set_min(flash.temperature_recovery);
@@ -461,6 +457,47 @@ int main()
             uv_level_percent = uv_level * 100 / flash.uv_level_highest;
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
         }
+
+        if(flash.exist.dry_contacts){
+            modbus_master_regs.control_read.disable  = false;
+            modbus_master_regs.control_write.disable = false;
+            if(work_flags.distance) {
+            if (modbus_master_regs.control_read & 0b001) {
+                work_flags.us_started = 1;
+            } else {
+                work_flags.us_started = 0;
+            }
+
+            if (modbus_master_regs.control_read & 0b010) {
+                work_flags.uv_started = 1;
+            } else {
+                work_flags.uv_started = 0;
+            }
+            }
+
+            if (work_flags.uv_on) {
+                modbus_master_regs.control_write |= (1 << 9);
+            }else {
+                modbus_master_regs.control_write &= ~(1 << 9);
+            }
+            if (work_flags.us_on) {
+                modbus_master_regs.control_write |= (1 << 8);
+            } else {
+                modbus_master_regs.control_write &= ~(1 << 8);
+            }
+            if (work_flags.is_alarm()) {
+                modbus_master_regs.control_write |= (1 << 10);
+            } else {
+                modbus_master_regs.control_write &= ~(1 << 10);
+            }
+
+            } else {
+            modbus_master_regs.control_read.disable  = true;
+            modbus_master_regs.control_write.disable = true;
+
+        }
+
+        work_flags.distance = modbus_master_regs.control_read & 0b100;
 
         on_us (work_flags.us_started and not overheat);
         on_uv (work_flags.uv_started and not overheat);

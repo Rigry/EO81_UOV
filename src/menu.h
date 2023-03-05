@@ -67,7 +67,20 @@ struct Menu : TickSubscriber {
         , Line {"Аварии"      ,[this]{ change_screen(alarm_select); }}
         , Line {"Наработка"   ,[this]{ change_screen(work_select);  }}
         , Line {"Конфигурация",[this]{ change_screen(config_select);}}
-        , Line {"Лог работы"  ,[this]{ change_screen(log_screen);   }}
+        , Line {"Режим работы",[this]{ change_screen(mode_screen);  }}
+    };
+
+    int mode {flash.automatic};
+    Set_screen<int, mode_to_string> mode_screen {
+          lcd, buttons_events
+        , "Режим работы"
+        , mode
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(main_select); }}
+        , Enter_callback  { [this]{ 
+            flash.automatic = modbus.work_flags.mode = mode;
+            change_screen(main_select);
+        }}
     };
 
     Select_screen<3> alarm_select {
@@ -321,7 +334,7 @@ struct Menu : TickSubscriber {
     };
 
     int confirm;
-    Select_screen<9> tech_select {
+    Select_screen<10> tech_select {
           lcd, buttons_events
         , Out_callback        { [this]{ /*modbus_master_regs.save_setting.disable = true;
                                         modbus_master_regs.service.disable = true;*/
@@ -344,6 +357,7 @@ struct Menu : TickSubscriber {
         }}
         , Line {"Датчик температуры" ,[this]{ change_screen(sens_temp_set);  }}
         , Line {"Датчик УФ"          ,[this]{ change_screen(sens_uv_set);    }}
+        , Line {"Сухие контакты"     ,[this]{ change_screen(dry_contacts_set);}}
     };
 
     Set_screen<uint8_t, model_to_string> name_set {
@@ -384,6 +398,19 @@ struct Menu : TickSubscriber {
         , Out_callback    { [this]{ change_screen(tech_select);  }}
         , Enter_callback  { [this]{
             modbus.quantity = flash.quantity;
+            change_screen(tech_select);
+        }}
+    };
+
+    int dry_contacts {flash.exist.dry_contacts};
+    Set_screen<int, exist_to_string> dry_contacts_set {
+          lcd, buttons_events
+        , "ЭО-101"
+        , dry_contacts
+        , Min<int>{0}, Max<int>{1}
+        , Out_callback    { [this]{ change_screen(tech_select); }}
+        , Enter_callback  { [this]{ 
+            flash.exist.dry_contacts = bool(dry_contacts);
             change_screen(tech_select);
         }}
     };
