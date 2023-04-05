@@ -449,6 +449,9 @@ int main()
             set_if_greater (&flash.uv_level_highest, uv_level);
             uv_level_percent = uv_level * 100 / flash.uv_level_highest;
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+        } else {
+            uv_level_percent = 0;
+            work_flags.uv_low_level = false;
         }
 
         if(flash.exist.dry_contacts){
