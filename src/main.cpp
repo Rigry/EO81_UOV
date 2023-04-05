@@ -456,6 +456,9 @@ int main()
             set_if_greater (&flash.uv_level_highest, uv_level);
             uv_level_percent = uv_level * 100 / flash.uv_level_highest;
             work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+        } else {
+            uv_level_percent = 0;
+            work_flags.uv_low_level = false;
         }
 
         if(flash.exist.dry_contacts){
@@ -506,7 +509,6 @@ int main()
         work_flags.bad_lamps = work_flags.uv_on and modbus_slave.outRegs.bad_lamps[0];
 
         alarm_led = work_flags.is_alarm();
-
 
         __WFI();
     }
