@@ -1,5 +1,8 @@
 #pragma once
 
+const uint16_t SERVICE_CODE {0x534D};
+const uint16_t RESET_CODE   {0x524D};
+const uint16_t SAVE_CODE    {0x5356};
 
 // флаги наличия в системе
 struct Exsist {

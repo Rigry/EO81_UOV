@@ -10,7 +10,7 @@ GIT_VERSION := "$(shell git describe --always --tags)"
 # source
 ######################################
 CPP_SOURCES_F1 = ./src/main.cpp
-LIBRARY_PATH = mculib3
+LIBRARY_PATH = ../mculib3
 
 ASM_SOURCES_F1 = $(LIBRARY_PATH)/STM32F1_files/startup_stm32f103xb.s
 LDSCRIPT_F1 = $(LIBRARY_PATH)/STM32F1_files/STM32F103RBTx_FLASH.ld
@@ -75,9 +75,8 @@ LIBS = -lc -lm -lnosys
 LDFLAGS_F1  = $(MCU_F1) -specs=nano.specs -specs=nosys.specs
 LDFLAGS_F1 += -T$(LDSCRIPT_F1) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET_F1).map,--cref -Wl,--gc-sections
 
-# default action: build all
-all: submodule clean \
-$(BUILD_DIR)/$(TARGET_F1).elf $(BUILD_DIR)/$(TARGET_F1).hex $(BUILD_DIR)/$(TARGET_F1).bin
+# default action: build all submodule clean 
+all: $(BUILD_DIR)/$(TARGET_F1).elf $(BUILD_DIR)/$(TARGET_F1).hex $(BUILD_DIR)/$(TARGET_F1).bin
 	
 
 
@@ -116,7 +115,7 @@ clean:
 	-rm -fR .dep $(BUILD_DIR)
 
 flash:
-	st-flash write $(BUILD_DIR)/$(TARGET_F1).bin 0x8000000
+	st-flash --reset write $(BUILD_DIR)/$(TARGET_F1).bin 0x8000000
 
 util:
 	st-util
@@ -124,11 +123,11 @@ util:
 test_:
 	$(MAKE) -C ./test/
 
-submodule:
-	git submodule update --init
-	cd mculib3/ && git fetch
-	cd mculib3/ && git checkout $(MCULIB_VERSION)
-	cd mculib3/ && git submodule update --init
+# submodule:
+# 	git submodule update --init
+# 	cd mculib3/ && git fetch
+# 	cd mculib3/ && git checkout $(MCULIB_VERSION)
+# 	cd mculib3/ && git submodule update --init
   
 #######################################
 # dependencies
