@@ -352,7 +352,7 @@ struct Menu : TickSubscriber {
           lcd, buttons_events
         , "Уровень низк. УФ"
         , flash.uv_level_min
-        , Min<uint8_t>{1}, Max<uint8_t>{100}
+        , Min<uint8_t>{0}, Max<uint8_t>{100}
         , Out_callback    { [this]{ change_screen(tech_select);  }}
     };
 

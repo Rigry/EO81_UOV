@@ -496,7 +496,7 @@ int main()
 
         work_flags.distance = modbus_master_regs.control_read & 0b100;
 
-        work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
+        // work_flags.uv_low_level = work_flags.uv_on and uv_level_percent < flash.uv_level_min;
 
 
         on_us (work_flags.us_started and not overheat);
