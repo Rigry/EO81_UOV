@@ -95,7 +95,7 @@ int main()
         Exsist exist = {
             .temp_sensor  = true,
             .uv_sensor    = true,
-            .dry_contacts = true
+            .dry_contacts = false
         };
         Count count = {
             .on        = 0,
@@ -186,14 +186,14 @@ int main()
     if(flash.quantity.extantions == 0) {
         modbus_master_regs.lamps_1.disable       = true;
         modbus_master_regs.bad_lamps_1.disable   = true;
-        modbus_master_regs.lamp_1                = true;
+        modbus_master_regs.lamp_1.disable        = true;
         modbus_master_regs.hours_1.disable       = true;
         modbus_master_regs.reset_hours_1.disable = true;
         modbus_master_regs.n_lamp_1.disable      = true;
 
         modbus_master_regs.lamps_2.disable       = true;
         modbus_master_regs.bad_lamps_2.disable   = true;
-        modbus_master_regs.lamp_2                = true;
+        modbus_master_regs.lamp_2.disable        = true;
         modbus_master_regs.hours_2.disable       = true;
         modbus_master_regs.reset_hours_2.disable = true;
         modbus_master_regs.n_lamp_2.disable      = true;
